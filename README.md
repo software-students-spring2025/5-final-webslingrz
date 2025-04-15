@@ -32,6 +32,8 @@ cd ..
 ./venv/bin/python backend/app.py
 ```
 
+Visit localhost via: http://127.0.0.1:5001
+
 ### Unit tests for web app
 ```
 
