@@ -34,6 +34,13 @@ cd ..
 
 Visit localhost via: http://127.0.0.1:5001
 
+# Running bird game (temporarily, until pygame is linked with flask)
+```
+python3 -m venv venv
+source venv/bin/activate 
+./venv/bin/python backend/bird_game.py
+```
+
 ### Unit tests for web app
 ```
 
