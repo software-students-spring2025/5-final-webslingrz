@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Bird Game</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    <nav>
+        <a href="/dashboard">Dashboard</a> |
+        <a href="/birds">Bird Collection</a> |
+        <a href="/logout">Logout</a>
+    </nav>
+
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <ul class="flashes">
@@ -14,6 +21,7 @@
             </ul>
         {% endif %}
     {% endwith %}
+
     {% block content %}{% endblock %}
 </body>
 </html>

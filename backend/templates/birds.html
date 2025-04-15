@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Your Bird Collection</h2>
+
+{% if birds %}
+    <ul>
+        {% for bird in birds %}
+            <li>{{ bird.name if bird.name else "Unnamed Bird" }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You haven't collected any birds yet!</p>
+{% endif %}
+{% endblock %}
