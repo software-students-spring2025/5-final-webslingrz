@@ -20,7 +20,7 @@ def load_scaled_image(path, target_width):
     return pygame.transform.scale(raw_img, (target_width, target_height))
 
 # Background
-bg = pygame.image.load(os.path.join(BASE_DIR, "assets/backgrounds/woodlands.jpg"))
+bg = pygame.image.load(os.path.join(BASE_DIR, "assets/backgrounds/woodlands.png"))
 
 # Bird image scaled to 1/10th of screen width (~80px wide)
 target_bird_width = screen_width // 10
