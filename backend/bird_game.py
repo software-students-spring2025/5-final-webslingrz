@@ -2,291 +2,222 @@ import os
 import pygame
 import random
 import time
+import numpy as np
 from datetime import datetime
 
-# Ensure paths are always correct
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Constants for game screen
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+
 pygame.init()
-screen_width, screen_height = 800, 600
-screen = pygame.display.set_mode((screen_width, screen_height))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Bird Watching")
 
-
-# Load and scale bird image to 1/10th of screen width
 def load_scaled_image(path, target_width):
     raw_img = pygame.image.load(path)
     aspect_ratio = raw_img.get_height() / raw_img.get_width()
     target_height = int(target_width * aspect_ratio)
     return pygame.transform.scale(raw_img, (target_width, target_height))
 
+def greyscale_surface(surface):
+    arr = pygame.surfarray.array3d(surface).astype(float)
+    grey = np.dot(arr[..., :3], [0.3, 0.59, 0.11])
+    grey_3ch = np.stack((grey,)*3, axis=-1).astype('uint8')
+    grey_surface = pygame.surfarray.make_surface(grey_3ch)
+    return pygame.transform.rotate(grey_surface, -0)
 
 # Background
-bg = load_scaled_image(os.path.join(BASE_DIR, "assets/backgrounds/forest.png"), screen_width)
+bg = load_scaled_image(os.path.join(BASE_DIR, "assets/backgrounds/forest.png"), SCREEN_WIDTH)
+target_bird_width = SCREEN_WIDTH // 10
 
-# pygame.image.load(os.path.join(BASE_DIR, "assets/backgrounds/forest.png"))
+# Bird images
+bird_images = {
+    "Duckling": "duckling.png",
+    "Alien": "alien.png",
+    "Cherry": "cherry.png",
+    "Confused": "confused.png",
+    "Crow": "crow.png",
+    "Cyan": "cyan.png",
+    "Dandy": "dandy.png",
+    "Eyelash": "eyelash.png",
+    "Gnome": "gnome.png",
+    "Green": "green.png",
+    "Hamilton": "hamilton.png",
+    "King Rook": "king_rook.png",
+    "Kiwi": "kiwi.png",
+    "Little Guy": "little_guy.png",
+    "Mafia": "mafia.png",
+    "Onigiri": "onigiri.png",
+    "Owl": "owl.png",
+    "Blue Parakeet": "parakeet_blue.png",
+    "Yellow Parakeet": "parakeet_yellow.png",
+    "Pirate": "pirate.png",
+    "Pitiful": "pitiful.png",
+    "Pleh": "pleh.png",
+    "Purple": "purple.png",
+    "Robin Hood": "robin_hood.png",
+    "Sans Undertale": "sans_undertale.png",
+    "Seed Dealer": "seed_dealer.png",
+    "Snowy Owl": "snowy_owl.png",
+    "Sonic": "sonic.png",
+    "Space": "space.png",
+    "Spiderman": "spiderman.png",
+    "Stork": "stork.png",
+    "Tomato": "tomato.png",
+    "Toucan": "toucan.png",
+    "Webslinger": "webslinger.png",
+    "Zelda": "zelda.png",
+    "Money Mogul": "money_mogul.png",
+}
 
-# Bird image scaled to 1/10th of screen width (~80px wide)
-target_bird_width = screen_width // 10
-duckling_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/duckling.png"), target_bird_width
-)
-alien_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/alien.png"), target_bird_width
-)
-cherry_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/cherry.png"), target_bird_width
-)
-confused_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/confused.png"), target_bird_width
-)
-crow_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/crow.png"), target_bird_width
-)
-cyan_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/cyan.png"), target_bird_width
-)
-dandy_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/dandy.png"), target_bird_width
-)
-eyelash_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/eyelash.png"), target_bird_width
-)
-gnome_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/gnome.png"), target_bird_width
-)
-green_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/green.png"), target_bird_width
-)
-hamilton_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/hamilton.png"), target_bird_width
-)
-king_rook_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/king_rook.png"), target_bird_width
-)
-kiwi_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/kiwi.png"), target_bird_width
-)
-little_guy_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/little_guy.png"), target_bird_width
-)
-mafia_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/mafia.png"), target_bird_width
-)
-onigiri_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/onigiri.png"), target_bird_width
-)
-owl_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/owl.png"), target_bird_width
-)
-blue_parakeet_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/parakeet_blue.png"), target_bird_width
-)
-yellow_parakeet_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/parakeet_yellow.png"), target_bird_width
-)
-pirate_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/pirate.png"), target_bird_width
-)
-pitiful_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/pitiful.png"), target_bird_width
-)
-pleh_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/pleh.png"), target_bird_width
-)
-purple_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/purple.png"), target_bird_width
-)
-robin_hood_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/robin_hood.png"), target_bird_width
-)
-sans_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/sans_undertale.png"), target_bird_width
-)
-seed_dealer_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/seed_dealer.png"), target_bird_width
-)
-snowy_owl_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/snowy_owl.png"), target_bird_width
-)
-sonic_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/sonic.png"), target_bird_width
-)
-space_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/space.png"), target_bird_width
-)
-spiderman_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/spiderman.png"), target_bird_width
-)
-stork_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/stork.png"), target_bird_width
-)
-tomato_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/tomato.png"), target_bird_width
-)
-toucan_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/toucan.png"), target_bird_width
-)
-webslinger_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/webslinger.png"), target_bird_width
-)
-zelda_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/zelda.png"), target_bird_width
-)
-money_mogul_img = load_scaled_image(
-    os.path.join(BASE_DIR, "assets/birds/money_mogul.png"), target_bird_width
-)
+bird_assets = {
+    name: load_scaled_image(os.path.join(BASE_DIR, f"assets/birds/{file}"), target_bird_width)
+    for name, file in bird_images.items()
+}
 
-
-
-FONT = pygame.font.SysFont("Arial", 24)
-
-
-# Bird data
 class Bird:
-    def __init__(self, name, image, gold_per_minute, spawn_chance, cooldown=1):
+    def __init__(self, name, image, gold_per_minute, spawn_chance, rarity):
         self.name = name
         self.image = image
-        self.gold_per_minute = gold_per_minute
         self.spawn_chance = spawn_chance
-        self.cooldown = cooldown  # seconds between spawn checks
+        self.gold_per_minute = gold_per_minute
+        self.rarity = rarity
 
+rarity_tiers = {
+    "common":     {"spawn_chance": 0.10,    "gold_per_sec": 0.01},
+    "uncommon":   {"spawn_chance": 0.033,   "gold_per_sec": 0.05},
+    "rare":       {"spawn_chance": 0.0083,  "gold_per_sec": 0.10},
+    "epic":       {"spawn_chance": 0.0017,  "gold_per_sec": 0.20},
+    "legendary":  {"spawn_chance": 0.00055, "gold_per_sec": 1.00},
+}
 
-duckling = Bird("Duckling", duckling_img, gold_per_minute=1, spawn_chance=0.10)
-alien = Bird("Alien", alien_img, gold_per_minute=1, spawn_chance=0.15)
-cherry = Bird("Cherry", cherry_img, gold_per_minute=1, spawn_chance=0.15)
-confused = Bird("Confused", confused_img, gold_per_minute=1, spawn_chance=0.15)
-crow = Bird("Crow", crow_img, gold_per_minute=1, spawn_chance=0.15)
-cyan = Bird("Cyan", cyan_img, gold_per_minute=1, spawn_chance=0.15)
-dandy = Bird("Dandy", dandy_img, gold_per_minute=1, spawn_chance=0.05)
-eyelash = Bird("Eyelash", eyelash_img, gold_per_minute=1, spawn_chance=0.05)
-gnome = Bird("Gnome", gnome_img, gold_per_minute=1, spawn_chance=0.15)
-green = Bird("Green", green_img, gold_per_minute=1, spawn_chance=0.15)
-hamilton = Bird("Hamilton", hamilton_img, gold_per_minute=1, spawn_chance=0.15)
-king_rook = Bird("King Rook", king_rook_img, gold_per_minute=1, spawn_chance=0.15)
-kiwi = Bird("Kiwi", kiwi_img, gold_per_minute=1, spawn_chance=0.15)
-little_guy = Bird("Little Guy", little_guy_img, gold_per_minute=1, spawn_chance=0.05)
-mafia = Bird("Mafia", mafia_img, gold_per_minute=1, spawn_chance=0.25)
-onigiri = Bird("Onigiri", onigiri_img, gold_per_minute=1, spawn_chance=0.25)
-owl = Bird("Owl", owl_img, gold_per_minute=1, spawn_chance=0.25)
-blue_parakeet = Bird(
-    "Blue Parakeet", blue_parakeet_img, gold_per_minute=1, spawn_chance=0.05
-)
-yellow_parakeet = Bird(
-    "Yellow Parakeet", yellow_parakeet_img, gold_per_minute=1, spawn_chance=0.05
-)
-pirate = Bird("Pirate", pirate_img, gold_per_minute=1, spawn_chance=0.25)
-pitiful = Bird("Pitiful", pitiful_img, gold_per_minute=1, spawn_chance=0.05)
-pleh = Bird("Pleh", pleh_img, gold_per_minute=1, spawn_chance=0.25)
-purple = Bird("Purple", purple_img, gold_per_minute=1, spawn_chance=0.25)
-robin_hood = Bird("Robin Hood", robin_hood_img, gold_per_minute=1, spawn_chance=0.35)
-sans = Bird("Sans Undertale", sans_img, gold_per_minute=1, spawn_chance=0.35)
-dealer = Bird("Seed Dealer", seed_dealer_img, gold_per_minute=1, spawn_chance=0.35)
-snowy_owl = Bird("Snowy Owl", snowy_owl_img, gold_per_minute=1, spawn_chance=0.35)
-sonic = Bird("Sonic", sonic_img, gold_per_minute=1, spawn_chance=0.35)
-space = Bird("Space", space_img, gold_per_minute=1, spawn_chance=0.15)
-spiderman = Bird("Spiderman", spiderman_img, gold_per_minute=1, spawn_chance=0.35)
-stork = Bird("Stork", stork_img, gold_per_minute=1, spawn_chance=0.05)
-tomato = Bird("Tomato", tomato_img, gold_per_minute=1, spawn_chance=0.05)
-toucan = Bird("Toucan", toucan_img, gold_per_minute=1, spawn_chance=0.35)
-webslinger = Bird("Webslinger", webslinger_img, gold_per_minute=1, spawn_chance=0.35)
-zelda = Bird("Zelda", zelda_img, gold_per_minute=1, spawn_chance=0.35)
-money_mogul = Bird("Money Mogul", money_mogul_img, gold_per_minute=100, spawn_chance=0.35)
+rarity_assignments = {
+    "common":     ["Duckling"],
+    "uncommon":   ["Alien", "Cherry", "Confused", "Crow", "Cyan", "Green", "Gnome"],
+    "rare":       ["Dandy", "Eyelash", "Little Guy", "Hamilton", "Blue Parakeet", "Yellow Parakeet",
+                   "Onigiri", "Mafia", "Kiwi", "King Rook", "Pirate", "Pitiful", "Pleh", "Purple"],
+    "epic":       ["Robin Hood", "Sans Undertale", "Seed Dealer", "Snowy Owl", "Sonic", "Space",
+                   "Spiderman", "Stork", "Tomato", "Toucan", "Webslinger", "Zelda"],
+    "legendary":  ["Money Mogul"]
+}
 
-bird_types = [
-    duckling,
-    alien,
-    cherry,
-    confused,
-    crow,
-    cyan,
-    dandy,
-    eyelash,
-    gnome,
-    green,
-    hamilton,
-    king_rook,
-    kiwi,
-    little_guy,
-    mafia,
-    onigiri,
-    owl,
-    blue_parakeet,
-    yellow_parakeet,
-    pirate,
-    pitiful,
-    pleh,
-    purple,
-    robin_hood,
-    sans,
-    dealer,
-    snowy_owl,
-    sonic,
-    space,
-    spiderman,
-    stork,
-    tomato,
-    toucan,
-    webslinger,
-    zelda,
-]
+bird_types = []
+for rarity, names in rarity_assignments.items():
+    for name in names:
+        bird_types.append(Bird(
+            name,
+            bird_assets[name],
+            rarity_tiers[rarity]["gold_per_sec"] * 60,
+            rarity_tiers[rarity]["spawn_chance"],
+            rarity
+        ))
+
+# Birdiary
+def show_birdiary(collected_set):
+    birdiary_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+    font = pygame.font.SysFont("Arial", 22)
+    big_font = pygame.font.SysFont("Arial", 28, bold=True)
+
+    scroll_offset = 0
+    scroll_speed = 30
+    item_height = 60
+    padding_top = 80
+
+    back_button = pygame.Rect(SCREEN_WIDTH - 120, 20, 100, 30)
+    max_scroll = max(0, len(bird_types) * item_height + padding_top - SCREEN_HEIGHT + 30)
+
+    running = True
+    while running:
+        birdiary_surface.fill((245, 245, 220))
+        y = 20 - scroll_offset
+
+        title = big_font.render("Birdiary", True, (50, 50, 50))
+        birdiary_surface.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, y))
+        y += 60
+
+        for bird in bird_types:
+            img = bird.image if bird.name in collected_set else greyscale_surface(bird.image)
+            img = pygame.transform.scale(img, (50, 50))
+            birdiary_surface.blit(img, (40, y))
+            desc = f"{bird.name}  |  {bird.rarity.title()}  |  {bird.gold_per_minute / 60:.2f} gold/sec"
+            rendered = font.render(desc, True, (30, 30, 30))
+            birdiary_surface.blit(rendered, (100, y + 10))
+            y += item_height
+
+        pygame.draw.rect(birdiary_surface, (180, 80, 80), back_button, border_radius=6)
+        back_text = font.render("Back", True, (255, 255, 255))
+        birdiary_surface.blit(back_text, (back_button.x + 20, back_button.y + 4))
+
+        screen.blit(birdiary_surface, (0, 0))
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN and back_button.collidepoint(event.pos):
+                running = False
+            elif event.type == pygame.MOUSEWHEEL:
+                scroll_offset -= event.y * scroll_speed
+                scroll_offset = max(0, min(scroll_offset, max_scroll))
 
 # Game state
 spawned_birds = []
 collected_birds = []
 gold = 0
 last_spawn_check = time.time()
-last_gold_tick = time.time()
 
-running = True
+FONT = pygame.font.SysFont("Arial", 24)
+BUTTON_FONT = pygame.font.SysFont("Arial", 20)
+birdiary_button = pygame.Rect(SCREEN_WIDTH - 180, 10, 160, 35)
+
 clock = pygame.time.Clock()
+running = True
 
 while running:
     screen.blit(bg, (0, 0))
-
     now = time.time()
+    delta_time = clock.get_time() / 1000
 
-    # Gold accumulation (once per minute)
-    if now - last_gold_tick >= 60:
-        gold += sum(b.gold_per_minute for b in collected_birds)
-        last_gold_tick = now
+    gold += sum(b.gold_per_minute / 60 for b in collected_birds) * delta_time
 
-    # Bird spawn check (every 1 second)
     if now - last_spawn_check >= 1:
         for bird in bird_types:
             if random.random() < bird.spawn_chance:
-                bird_width, bird_height = bird.image.get_size()
-                max_x = max(0, screen_width - bird_width)
-                max_y = max(0, screen_height - bird_height)
-                x = random.randint(0, max_x)
-                y = random.randint(0, max_y)
+                bw, bh = bird.image.get_size()
+                x = random.randint(0, SCREEN_WIDTH - bw)
+                y = random.randint(0, SCREEN_HEIGHT - bh)
                 spawned_birds.append({"bird": bird, "pos": (x, y)})
         last_spawn_check = now
 
-    # Draw birds
     for obj in spawned_birds:
         screen.blit(obj["bird"].image, obj["pos"])
 
-    # Draw gold
-    gold_text = FONT.render(f"Gold: {gold}", True, (255, 255, 0))
+    gold_text = FONT.render(f"Gold: {int(gold)}", True, (255, 255, 0))
     screen.blit(gold_text, (10, 10))
+
+    pygame.draw.rect(screen, (70, 130, 180), birdiary_button, border_radius=8)
+    button_text = BUTTON_FONT.render("Open Birdiary", True, (255, 255, 255))
+    screen.blit(button_text, (birdiary_button.x + 10, birdiary_button.y + 6))
 
     pygame.display.flip()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            mx, my = event.pos
-            for obj in spawned_birds[:]:
-                bx, by = obj["pos"]
-                bird_img = obj["bird"].image
-                rect = bird_img.get_rect(topleft=(bx, by))
-                if rect.collidepoint(mx, my):
-                    collected_birds.append(obj["bird"])
-                    print(f"Collected: {obj['bird'].name} @ {datetime.now()}")
-                    spawned_birds.remove(obj)
+            if birdiary_button.collidepoint(event.pos):
+                show_birdiary(set(b.name for b in collected_birds))
+            else:
+                mx, my = event.pos
+                for obj in spawned_birds[:]:
+                    rect = obj["bird"].image.get_rect(topleft=obj["pos"])
+                    if rect.collidepoint(mx, my):
+                        collected_birds.append(obj["bird"])
+                        print(f"Collected: {obj['bird'].name} @ {datetime.now()}")
+                        spawned_birds.remove(obj)
+                        break
 
     clock.tick(30)
 
