@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+python-dotenv = "*"
+pymongo = "*"
+flask = "*"
+flask-pymongo = "*"
+pylint = "*"
+black = "*"
+pygame = "*"
+numpy = "*"
+
+[dev-packages]
+pytest = "*"
+pylint = "*"
+black = "*"
+pytest-cov = "*"
+
+[requires]
+python_version = "3.12.3"
