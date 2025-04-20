@@ -162,11 +162,25 @@ def show_birdiary(collected_set):
                 scroll_offset -= event.y * scroll_speed
                 scroll_offset = max(0, min(scroll_offset, max_scroll))
 
+# Setting spawn points (ONLY 7 SPAWN POINTS, LONG BRANCH HAS TWO!!)
+SPAWN_POINTS = [
+    (50, 135), # top left
+    (140, 350), # long left
+    (270, 365), # long right
+    (240, 210), # swing
+    (220, 470), # bottom left
+    (600, 120), # top right
+    (630, 365) # bottom right
+]
+
+occupied_spawn = set()
+
 # Game state
 spawned_birds = []
 collected_birds = []
 gold = 0
 last_spawn_check = time.time()
+last_gold_update = time.time()
 
 FONT = pygame.font.SysFont("Arial", 24)
 BUTTON_FONT = pygame.font.SysFont("Arial", 20)
@@ -180,15 +194,19 @@ while running:
     now = time.time()
     delta_time = clock.get_time() / 1000
 
-    gold += sum(b.gold_per_minute / 60 for b in collected_birds) * delta_time
+    # Update gold real time, not every min
+    gold += sum(b.gold_per_minute for b in collected_birds) * delta_time
 
     if now - last_spawn_check >= 1:
+        unoccupied_spawn = [spawn for spawn in SPAWN_POINTS if spawn not in occupied_spawn]
+        random.shuffle(unoccupied_spawn)
+
         for bird in bird_types:
-            if random.random() < bird.spawn_chance:
+            if random.random() < bird.spawn_chance and unoccupied_spawn:
                 bw, bh = bird.image.get_size()
-                x = random.randint(0, SCREEN_WIDTH - bw)
-                y = random.randint(0, SCREEN_HEIGHT - bh)
-                spawned_birds.append({"bird": bird, "pos": (x, y)})
+                spawn_position = unoccupied_spawn.pop()
+                occupied_spawn.add(spawn_position)
+                spawned_birds.append({"bird": bird, "pos": spawn_position})
         last_spawn_check = now
 
     for obj in spawned_birds:
@@ -216,7 +234,10 @@ while running:
                     if rect.collidepoint(mx, my):
                         collected_birds.append(obj["bird"])
                         print(f"Collected: {obj['bird'].name} @ {datetime.now()}")
+                        occupied_spawn.discard(obj["pos"])
                         spawned_birds.remove(obj)
+                        gold + obj["bird"].gold_per_minute / 60
+                        last_gold_update = time.time()
                         break
 
     clock.tick(30)

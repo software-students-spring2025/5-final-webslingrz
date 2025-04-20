@@ -3,9 +3,9 @@
 
 # Team
 * Brian Zou [Brian's Github](https://github.com/brianzou03)
-* Andrew Bao
-* Ritz (Jasmine) Fan
-* Bryant To
+* Andrew Bao [Andrew's Github](https://github.com/andrew-bao)
+* Jasmine Fan [Jasmine's Github](https://github.com/jasmine7310)
+* Bryant To [Bryant's Github](https://github.com/bryantto08)
 
 # How to Run via Docker
 ### Full Application
@@ -48,7 +48,7 @@ source venv/bin/activate
 
 
 # Task Board
-View our task board [here]()
+View our task board [here](https://github.com/orgs/software-students-spring2025/projects/234/views/2)
 
 # Technology
 * Python / Flask
