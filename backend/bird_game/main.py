@@ -1,8 +1,9 @@
 import os
+import numpy as np
 import pygame
+import pygame.surfarray
 import random
 import time
-import numpy as np
 from datetime import datetime
 import asyncio
 import json
