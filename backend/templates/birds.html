@@ -1,15 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Your Bird Collection</h2>
-
-{% if birds %}
-    <ul>
-        {% for bird in birds %}
-            <li>{{ bird.name if bird.name else "Unnamed Bird" }}</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>You haven't collected any birds yet!</p>
-{% endif %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Your Bird Collection</h2>
+            <p class="lead">Birds you've discovered will appear here.</p>
+            <a href="{{ url_for('game.dashboard') }}" class="btn btn-primary">Back to Game</a>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% if birds %}
+            {% for bird in birds %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ bird.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ bird.rarity|title }}</h6>
+                        <p class="card-text">
+                            Generates {{ "%.2f"|format(bird.gold_per_minute/60) }} gold per second
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <p>You haven't collected any birds yet. Go back to the game and start collecting!</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
