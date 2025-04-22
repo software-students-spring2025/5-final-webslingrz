@@ -42,10 +42,64 @@ source venv/bin/activate
 ```
 
 ### Unit tests for web app
+#### main game loop test
+* test_bird_spawn_probability_logic
+* test_gold_accumulation_over_time
+* test_collect_bird_removes_from_spawn
+* test_open_birdiary_view
+* test_open_store_view
+* test_purchase_deco_with_enough_gold
+* test_purchase_deco_with_insufficient_gold
 ```
 
 ```
 
+#### routes test
+* test_dashboard_requires_login
+* test_dashboard_loads_correct_money
+* test_birds_requires_login
+* test_birds_loads_correct_collection
+* test_play_requires_login
+* test_build_game_logged_in
+* test_build_game_not_logged_in
+* test_update_money_valid
+* test_update_money_invalid_data
+* test_update_money_not_logged_in
+* test_update_birds_valid
+* test_update_birds_invalid_data
+* test_update_birds_not_logged_in
+```
+pytest test_app/test_game_routes.py
+```
+
+#### auth test
+* test_register_new_user
+* test_register_existing_user
+* test_login_valid_user
+* test_login_invalid_user
+* test_logout_clears_session
+```
+cd backend
+pytest test_app/test_auth.py
+```
+
+#### utilities test
+* test_load_scaled_image_valid_path
+* test_load_scaled_image_invalid_path
+* test_greyscale_surface_returns_correct_shape
+* test_add_error_message_limit
+* test_draw_error_messages_displays_recent
+```
+cd backend
+pytest test_app/test_utilities.py
+```
+
+#### flask test
+* test_app_home_redirects_to_dashboard
+* test_register_blueprints_sets_routes
+```
+pytest backend/test_app/test_flask_app.py
+```
 
 # Task Board
 View our task board [here](https://github.com/orgs/software-students-spring2025/projects/234/views/2)
