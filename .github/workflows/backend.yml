@@ -28,11 +28,10 @@ jobs:
           docker compose -f docker-compose-dev.yml up --build -d
       - name: Wait for services to be ready
         run: sleep 10
-      - name: Install pipenv
-        run: pip install pipenv
       - name: Test backend
         working-directory: backend
         run: |
+          pip install -r requirements.txt
           pip install pytest
           python -m pytest
   push_to_docker_hub:
