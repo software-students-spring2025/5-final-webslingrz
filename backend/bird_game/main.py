@@ -1,78 +1,65 @@
 import os
-import numpy as np
 import pygame
-import pygame.surfarray
 import random
 import time
+import numpy as np
 from datetime import datetime
 import asyncio
-import json
+import traceback
 
 # Constants for game screen
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 
-# For web deployment, use relative paths
-BASE_DIR = ""
+# Paths need to be relative for web deployment
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Web integration - used to communicate with Flask
-async def save_game_data(data):
-    try:
-        import js
-        from js import fetch, JSON
-        
-        # Create a JSON string from the data
-        json_data = JSON.stringify(data)
-        
-        # Send the data to the Flask backend
-        response = await fetch('/update-money', {
-            'method': 'POST',
-            'headers': {
-                'Content-Type': 'application/json',
-            },
-            'body': json_data
-        })
-        
-        result = await response.json()
-        return result.get('success', False)
-    except Exception as e:
-        print(f"Error saving game data: {e}")
-        return False
+# Error handling and display
+error_messages = []
+MAX_ERROR_MESSAGES = 3
 
-async def save_birds_data(birds_data):
-    try:
-        import js
-        from js import fetch, JSON
-        
-        # Create a JSON string from the data
-        json_data = JSON.stringify(birds_data)
-        
-        # Send the data to the Flask backend
-        response = await fetch('/update-birds', {
-            'method': 'POST',
-            'headers': {
-                'Content-Type': 'application/json',
-            },
-            'body': json_data
-        })
-        
-        result = await response.json()
-        return result.get('success', False)
-    except Exception as e:
-        print(f"Error saving birds data: {e}")
-        return False
+def add_error_message(error_text):
+    """Add an error message to be displayed on screen"""
+    error_messages.append(error_text)
+    if len(error_messages) > MAX_ERROR_MESSAGES:
+        error_messages.pop(0)  # Remove oldest message if limit reached
+    print(f"ERROR: {error_text}")
+
+def draw_error_messages(screen, font):
+    """Draw error messages on the screen"""
+    if not error_messages:
+        return
+    
+    error_surface = pygame.Surface((SCREEN_WIDTH, len(error_messages) * 30 + 20))
+    error_surface.set_alpha(200)
+    error_surface.fill((50, 0, 0))
+    screen.blit(error_surface, (0, 0))
+    
+    for i, msg in enumerate(error_messages):
+        text = font.render(msg, True, (255, 200, 200))
+        screen.blit(text, (10, 10 + i * 30))
 
 def load_scaled_image(path, target_width):
-    raw_img = pygame.image.load(path)
-    aspect_ratio = raw_img.get_height() / raw_img.get_width()
-    target_height = int(target_width * aspect_ratio)
-    return pygame.transform.scale(raw_img, (target_width, target_height))
+    try:
+        raw_img = pygame.image.load(path)
+        aspect_ratio = raw_img.get_height() / raw_img.get_width()
+        target_height = int(target_width * aspect_ratio)
+        return pygame.transform.scale(raw_img, (target_width, target_height))
+    except Exception as e:
+        add_error_message(f"Failed to load image {path}")
+        # Return a colored placeholder instead
+        surface = pygame.Surface((target_width, target_width))
+        surface.fill((255, 0, 255))  # Magenta for missing textures
+        return surface
 
 def greyscale_surface(surface):
-    arr = pygame.surfarray.array3d(surface).astype(float)
-    grey = np.dot(arr[..., :3], [0.3, 0.59, 0.11])
-    grey_3ch = np.stack((grey,)*3, axis=-1).astype('uint8')
-    grey_surface = pygame.surfarray.make_surface(grey_3ch)
-    return pygame.transform.rotate(grey_surface, -0)
+    try:
+        arr = pygame.surfarray.array3d(surface).astype(float)
+        grey = np.dot(arr[..., :3], [0.3, 0.59, 0.11])
+        grey_3ch = np.stack((grey,)*3, axis=-1).astype('uint8')
+        grey_surface = pygame.surfarray.make_surface(grey_3ch)
+        return pygame.transform.rotate(grey_surface, -0)
+    except Exception as e:
+        return surface  # Return original surface if conversion fails
 
 class Bird:
     def __init__(self, name, image, gold_per_minute, spawn_chance, rarity):
@@ -81,83 +68,162 @@ class Bird:
         self.spawn_chance = spawn_chance
         self.gold_per_minute = gold_per_minute
         self.rarity = rarity
-    
-    def to_dict(self):
-        return {
-            "name": self.name,
-            "gold_per_minute": self.gold_per_minute,
-            "rarity": self.rarity
-        }
 
-# Birdiary function must be async for pygbag
 async def show_birdiary(screen, collected_set, bird_types):
-    birdiary_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-    font = pygame.font.SysFont("Arial", 22)
-    big_font = pygame.font.SysFont("Arial", 28, bold=True)
+    try:
+        birdiary_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        font = pygame.font.SysFont("Arial", 22)
+        big_font = pygame.font.SysFont("Arial", 28, bold=True)
+        error_font = pygame.font.SysFont("Arial", 18)
 
-    scroll_offset = 0
-    scroll_speed = 30
-    item_height = 60
-    padding_top = 80
+        scroll_offset = 0
+        scroll_speed = 30
+        item_height = 60
+        padding_top = 80
 
-    back_button = pygame.Rect(SCREEN_WIDTH - 120, 20, 100, 30)
-    max_scroll = max(0, len(bird_types) * item_height + padding_top - SCREEN_HEIGHT + 30)
+        back_button = pygame.Rect(SCREEN_WIDTH - 120, 20, 100, 30)
+        max_scroll = max(0, len(bird_types) * item_height + padding_top - SCREEN_HEIGHT + 30)
 
-    running = True
-    while running:
-        birdiary_surface.fill((245, 245, 220))
-        y = 20 - scroll_offset
+        running = True
+        while running:
+            birdiary_surface.fill((245, 245, 220))
+            y = 20 - scroll_offset
 
-        title = big_font.render("Birdiary", True, (50, 50, 50))
-        birdiary_surface.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, y))
-        y += 60
+            title = big_font.render("Birdiary", True, (50, 50, 50))
+            birdiary_surface.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, y))
+            y += 60
 
-        for bird in bird_types:
-            img = bird.image if bird.name in collected_set else greyscale_surface(bird.image)
-            img = pygame.transform.scale(img, (50, 50))
-            birdiary_surface.blit(img, (40, y))
-            desc = f"{bird.name}  |  {bird.rarity.title()}  |  {bird.gold_per_minute / 60:.2f} gold/sec"
-            rendered = font.render(desc, True, (30, 30, 30))
-            birdiary_surface.blit(rendered, (100, y + 10))
-            y += item_height
+            for bird in bird_types:
+                img = bird.image if bird.name in collected_set else greyscale_surface(bird.image)
+                img = pygame.transform.scale(img, (50, 50))
+                birdiary_surface.blit(img, (40, y))
+                desc = f"{bird.name}  |  {bird.rarity.title()}  |  {bird.gold_per_minute / 60:.2f} gold/sec"
+                rendered = font.render(desc, True, (30, 30, 30))
+                birdiary_surface.blit(rendered, (100, y + 10))
+                y += item_height
 
-        pygame.draw.rect(birdiary_surface, (180, 80, 80), back_button, border_radius=6)
-        back_text = font.render("Back", True, (255, 255, 255))
-        birdiary_surface.blit(back_text, (back_button.x + 20, back_button.y + 4))
+            pygame.draw.rect(birdiary_surface, (180, 80, 80), back_button, border_radius=6)
+            back_text = font.render("Back", True, (255, 255, 255))
+            birdiary_surface.blit(back_text, (back_button.x + 20, back_button.y + 4))
 
-        screen.blit(birdiary_surface, (0, 0))
-        pygame.display.flip()
+            screen.blit(birdiary_surface, (0, 0))
+            
+            draw_error_messages(screen, error_font)
+            
+            pygame.display.flip()
 
-        # Process events
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return False
-            elif event.type == pygame.MOUSEBUTTONDOWN and back_button.collidepoint(event.pos):
-                running = False
-            elif event.type == pygame.MOUSEWHEEL:
-                scroll_offset -= event.y * scroll_speed
-                scroll_offset = max(0, min(scroll_offset, max_scroll))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+                elif event.type == pygame.MOUSEBUTTONDOWN and back_button.collidepoint(event.pos):
+                    running = False
+                elif event.type == pygame.MOUSEWHEEL:
+                    scroll_offset -= event.y * scroll_speed
+                    scroll_offset = max(0, min(scroll_offset, max_scroll))
+                    
+            await asyncio.sleep(0)
+        
+        return True
+    except Exception as e:
+        add_error_message(f"Birdiary error: {str(e)}")
+        return True  # Continue game despite error
+
+# Deco Store function
+async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco_spawn_points):
+    try:
+        store_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        font = pygame.font.SysFont("Arial", 22)
+        big_font = pygame.font.SysFont("Arial", 28, bold=True)
+        error_font = pygame.font.SysFont("Arial", 18)
+
+        scroll_offset = 0
+        scroll_speed = 30
+        item_height = 60
+        padding_top = 80
+
+        back_button = pygame.Rect(SCREEN_WIDTH - 120, 20, 100, 30)
+        max_scroll = max(0, len(deco_assets) * item_height + padding_top - SCREEN_HEIGHT + 30)
+
+        running = True
+        while running:
+            store_surface.fill((245, 245, 220))
+            y = 20 - scroll_offset
+
+            title = big_font.render("Deco Store", True, (50, 50, 50))
+            store_surface.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, y))
+            y += 60
+
+            clickable_items = []
+
+            for name, image in deco_assets.items():
+                img = image if name in purchased_set else greyscale_surface(image)
+                img = pygame.transform.scale(img, (50, 50))
+                store_surface.blit(img, (40, y))
                 
-        # Allow other coroutines to run - required for web version
-        await asyncio.sleep(0)
-    
-    return True
+                status = "Purchased" if name in purchased_set else f"{deco_prices[name]} gold"
+                desc = f"{name}  |  {status}"
+                rendered = font.render(desc, True, (30, 30, 30))
+                store_surface.blit(rendered, (100, y + 10))
 
+                clickable_items.append((pygame.Rect(40, y, SCREEN_WIDTH - 80, item_height), name))
+                y += item_height
+
+            pygame.draw.rect(store_surface, (180, 80, 80), back_button, border_radius=6)
+            back_text = font.render("Back", True, (255, 255, 255))
+            store_surface.blit(back_text, (back_button.x + 20, back_button.y + 4))
+
+            gold_text = font.render(f"Gold: {int(gold)}", True, (80, 60, 20))
+            store_surface.blit(gold_text, (20, 20))
+
+            screen.blit(store_surface, (0, 0))
+            
+            draw_error_messages(screen, error_font)
+            
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False, gold
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if back_button.collidepoint(event.pos):
+                        running = False
+                    else:
+                        for rect, name in clickable_items:
+                            if rect.collidepoint(event.pos) and name not in purchased_set:
+                                price = deco_prices[name]
+                                if gold >= price:
+                                    gold -= price
+                                    purchased_set.add(name)
+                                else:
+                                    add_error_message("Not enough gold!")
+                elif event.type == pygame.MOUSEWHEEL:
+                    scroll_offset -= event.y * scroll_speed
+                    scroll_offset = max(0, min(scroll_offset, max_scroll))
+                    
+            await asyncio.sleep(0)
+
+        return True, gold
+    except Exception as e:
+        add_error_message(f"Store error: {str(e)}")
+        return True, gold  # Continue game despite error
+
+# The main game function
 async def main():
     try:
         pygame.init()
-        print("Pygame initialized successfully")
-        screen = pygame.display.set_mode((800, 600))
-        print("Display mode set successfully")
+        
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Bird Watching")
         
-        # Load game assets
         target_bird_width = SCREEN_WIDTH // 10
+        target_deco_width = SCREEN_WIDTH // 8
         
-        # Background
-        bg = load_scaled_image("assets/backgrounds/forest.png", SCREEN_WIDTH)
+        error_font = pygame.font.SysFont("Arial", 18)
         
-        # Bird images
+        bg_path = os.path.join(BASE_DIR, "assets/backgrounds/forest.png")
+        bg = load_scaled_image(bg_path, SCREEN_WIDTH)
+        bg = pygame.transform.scale(bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        
         bird_images = {
             "Duckling": "duckling.png",
             "Alien": "alien.png",
@@ -197,156 +263,189 @@ async def main():
             "Money Mogul": "money_mogul.png",
         }
         
-        bird_assets = {
-            name: load_scaled_image(f"assets/birds/{file}", target_bird_width)
-            for name, file in bird_images.items()
+        deco_images = {
+            "Bath": "bath.png",
+            "Clock": "clock.png",
+            "Froggy Fountain": "froggy_fountain.png",
+            "Lamp": "lamp.png",
+            "Sofa": "sofa.png"
+        }
+        
+        bird_assets = {}
+        for name, file in bird_images.items():
+            bird_path = os.path.join(BASE_DIR, f"assets/birds/{file}")
+            bird_assets[name] = load_scaled_image(bird_path, target_bird_width)
+        
+        deco_assets = {}
+        for name, file in deco_images.items():
+            deco_path = os.path.join(BASE_DIR, f"assets/decoration/{file}")
+            deco_assets[name] = load_scaled_image(deco_path, target_deco_width)
+        
+        deco_prices = {
+            "Bath": 100,
+            "Clock": 150,
+            "Froggy Fountain": 300,
+            "Lamp": 80,
+            "Sofa": 200
         }
         
         rarity_tiers = {
-            "common":     {"spawn_chance": 0.10,    "gold_per_sec": 0.01},
-            "uncommon":   {"spawn_chance": 0.033,   "gold_per_sec": 0.05},
-            "rare":       {"spawn_chance": 0.0083,  "gold_per_sec": 0.10},
-            "epic":       {"spawn_chance": 0.0017,  "gold_per_sec": 0.20},
-            "legendary":  {"spawn_chance": 0.00055, "gold_per_sec": 1.00},
+            "common": {"spawn_chance": 0.10, "gold_per_sec": 0.01},
+            "uncommon": {"spawn_chance": 0.033, "gold_per_sec": 0.05},
+            "rare": {"spawn_chance": 0.0083, "gold_per_sec": 0.10},
+            "epic": {"spawn_chance": 0.0017, "gold_per_sec": 0.20},
+            "legendary": {"spawn_chance": 0.00055, "gold_per_sec": 1.00},
         }
         
         rarity_assignments = {
-            "common":     ["Duckling"],
-            "uncommon":   ["Alien", "Cherry", "Confused", "Crow", "Cyan", "Green", "Gnome"],
-            "rare":       ["Dandy", "Eyelash", "Little Guy", "Hamilton", "Blue Parakeet", "Yellow Parakeet",
-                        "Onigiri", "Mafia", "Kiwi", "King Rook", "Pirate", "Pitiful", "Pleh", "Purple"],
-            "epic":       ["Robin Hood", "Sans Undertale", "Seed Dealer", "Snowy Owl", "Sonic", "Space",
-                        "Spiderman", "Stork", "Tomato", "Toucan", "Webslinger", "Zelda"],
-            "legendary":  ["Money Mogul"]
+            "common": ["Duckling"],
+            "uncommon": ["Alien", "Cherry", "Confused", "Crow", "Cyan", "Green", "Gnome"],
+            "rare": ["Dandy", "Eyelash", "Little Guy", "Hamilton", "Blue Parakeet", "Yellow Parakeet",
+                    "Onigiri", "Mafia", "Kiwi", "King Rook", "Pirate", "Pitiful", "Pleh", "Purple"],
+            "epic": ["Robin Hood", "Sans Undertale", "Seed Dealer", "Snowy Owl", "Sonic", "Space",
+                    "Spiderman", "Stork", "Tomato", "Toucan", "Webslinger", "Zelda"],
+            "legendary": ["Money Mogul"]
         }
         
         bird_types = []
         for rarity, names in rarity_assignments.items():
             for name in names:
-                bird_types.append(Bird(
-                    name,
-                    bird_assets[name],
-                    rarity_tiers[rarity]["gold_per_sec"] * 60,
-                    rarity_tiers[rarity]["spawn_chance"],
-                    rarity
-                ))
+                if name in bird_assets:
+                    bird_types.append(Bird(
+                        name,
+                        bird_assets[name],
+                        rarity_tiers[rarity]["gold_per_sec"] * 60,
+                        rarity_tiers[rarity]["spawn_chance"],
+                        rarity
+                    ))
         
-        # Game state
+        SPAWN_POINTS = [
+            (50, 135),  # top left
+            (140, 350),  # long left
+            (270, 365),  # long right
+            (240, 210),  # swing
+            (220, 485),  # bottom left
+            (600, 125),  # top right
+            (630, 385)  # bottom right
+        ]
+        
+        DECO_SPAWN_POINTS = {
+            "Lamp": (50, 320),
+            "Bath": (100, 100),  # NOT POSITIONED YET
+            "Clock": (100, 465),
+            "Froggy Fountain": (100, 100),  # NOT POSITIONED YET
+            "Sofa": (100, 100)  # NOT POSITIONED YET
+        }
+        
         spawned_birds = []
         collected_birds = []
+        purchased_deco = set()
         gold = 0
         last_spawn_check = time.time()
-        last_save_time = time.time()
-        
-        # Save interval (in seconds)
-        SAVE_INTERVAL = 30
+        occupied_spawn = set()
         
         FONT = pygame.font.SysFont("Arial", 24)
         BUTTON_FONT = pygame.font.SysFont("Arial", 20)
         birdiary_button = pygame.Rect(SCREEN_WIDTH - 180, 10, 160, 35)
+        store_button = pygame.Rect(SCREEN_WIDTH - 180, 60, 160, 35)
         
         clock = pygame.time.Clock()
         running = True
         
         while running:
-            screen.blit(bg, (0, 0))
-            now = time.time()
-            delta_time = clock.get_time() / 1000
-            
-            # Update gold based on collected birds
-            gold += sum(b.gold_per_minute / 60 for b in collected_birds) * delta_time
-            
-            # Save game data periodically
-            if now - last_save_time >= SAVE_INTERVAL:
-                # Save gold to the database
-                await save_game_data({"money": int(gold)})
+            try:
+                screen.blit(bg, (0, 0))
+                now = time.time()
+                delta_time = clock.get_time() / 1000
                 
-                # Save collected birds to the database
-                bird_data = {"birds": [bird.to_dict() for bird in collected_birds]}
-                await save_birds_data(bird_data)
+                gold += sum(b.gold_per_minute for b in collected_birds) * delta_time / 60
                 
-                last_save_time = now
+                if now - last_spawn_check >= 1:
+                    unoccupied_spawn = [spawn for spawn in SPAWN_POINTS if spawn not in occupied_spawn]
+                    random.shuffle(unoccupied_spawn)
+                    
+                    for bird in bird_types:
+                        if random.random() < bird.spawn_chance and unoccupied_spawn:
+                            spawn_position = unoccupied_spawn.pop()
+                            occupied_spawn.add(spawn_position)
+                            spawned_birds.append({"bird": bird, "pos": spawn_position})
+                    last_spawn_check = now
+                
+                for obj in spawned_birds:
+                    screen.blit(obj["bird"].image, obj["pos"])
+                
+                for deco in purchased_deco:
+                    if deco in deco_assets and deco in DECO_SPAWN_POINTS:
+                        screen.blit(deco_assets[deco], DECO_SPAWN_POINTS[deco])
+                
+                gold_text = FONT.render(f"Gold: {int(gold)}", True, (255, 255, 0))
+                screen.blit(gold_text, (10, 10))
+                
+                pygame.draw.rect(screen, (70, 130, 180), birdiary_button, border_radius=8)
+                pygame.draw.rect(screen, (70, 130, 180), store_button, border_radius=8)
+                
+                button_text = BUTTON_FONT.render("Open Birdiary", True, (255, 255, 255))
+                store_text = BUTTON_FONT.render("Store", True, (255, 255, 255))
+                
+                screen.blit(button_text, (birdiary_button.x + 10, birdiary_button.y + 6))
+                screen.blit(store_text, (store_button.x + 10, store_button.y + 6))
+                
+                draw_error_messages(screen, error_font)
+                
+                pygame.display.flip()
+                
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        if birdiary_button.collidepoint(event.pos):
+                            collected_set = set(b.name for b in collected_birds)
+                            game_status = await show_birdiary(screen, collected_set, bird_types)
+                            running = game_status
+                        elif store_button.collidepoint(event.pos):
+                            game_status, gold = await show_store(screen, purchased_deco, gold, deco_assets, deco_prices, DECO_SPAWN_POINTS)
+                            running = game_status
+                        else:
+                            mx, my = event.pos
+                            for obj in spawned_birds[:]:
+                                rect = obj["bird"].image.get_rect(topleft=obj["pos"])
+                                if rect.collidepoint(mx, my):
+                                    collected_birds.append(obj["bird"])
+                                    print(f"Collected: {obj['bird'].name} @ {datetime.now()}")
+                                    occupied_spawn.discard(obj["pos"])
+                                    spawned_birds.remove(obj)
+                                    break
             
-            # Spawn new birds
-            if now - last_spawn_check >= 1:
-                for bird in bird_types:
-                    if random.random() < bird.spawn_chance:
-                        bw, bh = bird.image.get_size()
-                        x = random.randint(0, SCREEN_WIDTH - bw)
-                        y = random.randint(0, SCREEN_HEIGHT - bh)
-                        spawned_birds.append({"bird": bird, "pos": (x, y)})
-                last_spawn_check = now
+            except Exception as e:
+                # Main game loop error handling
+                add_error_message(f"Game loop error: {str(e)}")
             
-            # Draw spawned birds
-            for obj in spawned_birds:
-                screen.blit(obj["bird"].image, obj["pos"])
-            
-            # Display gold
-            gold_text = FONT.render(f"Gold: {int(gold)}", True, (255, 255, 0))
-            screen.blit(gold_text, (10, 10))
-            
-            # Draw birdiary button
-            pygame.draw.rect(screen, (70, 130, 180), birdiary_button, border_radius=8)
-            button_text = BUTTON_FONT.render("Open Birdiary", True, (255, 255, 255))
-            screen.blit(button_text, (birdiary_button.x + 10, birdiary_button.y + 6))
-            
-            pygame.display.flip()
-            
-            # Event handling
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if birdiary_button.collidepoint(event.pos):
-                        # Must use await for async function
-                        game_status = await show_birdiary(screen, set(b.name for b in collected_birds), bird_types)
-                        running = game_status
-                    else:
-                        mx, my = event.pos
-                        for obj in spawned_birds[:]:
-                            rect = obj["bird"].image.get_rect(topleft=obj["pos"])
-                            if rect.collidepoint(mx, my):
-                                collected_birds.append(obj["bird"])
-                                print(f"Collected: {obj['bird'].name} @ {datetime.now()}")
-                                spawned_birds.remove(obj)
-                                
-                                # Save immediately when a bird is collected
-                                await save_game_data({"money": int(gold)})
-                                bird_data = {"birds": [bird.to_dict() for bird in collected_birds]}
-                                await save_birds_data(bird_data)
-                                break
-            
-            clock.tick(30)
-            
-            # Critical for pygbag: Allow browser to process events
-            await asyncio.sleep(0)
-        
-        # Final save before quitting
-        await save_game_data({"money": int(gold)})
-        bird_data = {"birds": [bird.to_dict() for bird in collected_birds]}
-        await save_birds_data(bird_data)
+            try:
+                clock.tick(30)
+                await asyncio.sleep(0)
+            except Exception as e:
+                add_error_message(f"Clock error: {str(e)}")
         
         pygame.quit()
+    
     except Exception as e:
-        print(f"Error in main game loop: {str(e)}")
-        # In browser, make error visible
-        import sys
-        pygame.display.set_mode((800, 600))
-        font = pygame.font.SysFont("Arial", 18)
-        screen = pygame.display.get_surface()
-        screen.fill((255, 0, 0))  # Red background for error
-        text = font.render(f"Error: {str(e)}", True, (255, 255, 255))
-        screen.blit(text, (50, 50))
-        pygame.display.flip()
-        
-        # Keep the error visible
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-            await asyncio.sleep(0.1)
+        print(f"Fatal error: {str(e)}")
+        try:
+            if 'screen' in locals():
+                error_font = pygame.font.Font(None, 24)
+                screen.fill((0, 0, 0))
+                error_text = error_font.render(f"FATAL ERROR: {str(e)}", True, (255, 0, 0))
+                screen.blit(error_text, (10, 10))
+                pygame.display.flip()
+                await asyncio.sleep(5)  # Show error for 5 seconds
+        except:
+            pass
+        finally:
+            try:
+                pygame.quit()
+            except:
+                pass
 
-
-# This is the entry point for Pygbag
-asyncio.run(main())
+# Entry point
+if __name__ == "__main__":
+    asyncio.run(main())
