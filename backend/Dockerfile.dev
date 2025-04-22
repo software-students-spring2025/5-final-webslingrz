@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 5001
 
-CMD ["gunicorn", "--config", "gunicorn_config.py", "wsgi:app"]
+CMD ["python", "app.py"]

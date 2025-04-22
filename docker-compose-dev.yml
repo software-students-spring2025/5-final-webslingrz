@@ -6,14 +6,15 @@ services:
     container_name: mongodb
     ports:
       - "27017:27017"
-
   backend:
-    image: bt2181/webslingerz:${GITHUB_SHA::7}
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
     ports:
       - "5001:5001"
     environment:
       - MONGO_URI=mongodb://mongodb:27017/birdgame
       - SECRET_KEY=devsecret
-      - FLASK_ENV=production
+      - FLASK_ENV=development
     depends_on:
       - mongodb
