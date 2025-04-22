@@ -1,59 +1,154 @@
+/* ---------- Base Styles ---------- */
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f8ff;
     margin: 0;
-    padding: 20px;
+    padding: 0;
 }
 
+/* ---------- Navbar ---------- */
 nav {
     background-color: #333;
-    padding: 10px;
-    margin-bottom: 20px;
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
 }
 
 nav a {
     color: white;
-    margin-right: 15px;
     text-decoration: none;
+    font-weight: bold;
 }
 
 nav a:hover {
     text-decoration: underline;
 }
 
-h2 {
-    color: #2a5d84;
+/* ---------- Page Layout ---------- */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+.col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 10px;
+}
+
+.col-md-4 {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+    padding: 10px;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* ---------- Typography ---------- */
+h1, h2, h3 {
+    color: #2a5d84;
+    margin-bottom: 15px;
+}
+
+p.lead {
+    font-size: 1.1rem;
+    color: #444;
+    margin-top: 0;
+}
+
+/* ---------- Forms ---------- */
 form {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
-    width: 300px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 400px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+label {
+    font-weight: bold;
+    margin-top: 10px;
+    display: block;
 }
 
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="email"] {
     width: 100%;
-    padding: 8px;
-    margin: 8px 0;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     box-sizing: border-box;
+    font-size: 1rem;
 }
 
-button {
+input:focus {
+    border-color: #2a5d84;
+    outline: none;
+}
+
+/* ---------- Buttons ---------- */
+button,
+.btn {
     background-color: #2a5d84;
     color: white;
     border: none;
     padding: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 5px;
     cursor: pointer;
     width: 100%;
+    margin-top: 10px;
+    text-align: center;
 }
 
-button:hover {
+button:hover,
+.btn:hover {
     background-color: #1c3d5a;
 }
 
+.btn-primary {
+    background-color: #3498db;
+}
+
+.btn-primary:hover {
+    background-color: #217dbb;
+}
+
+.btn-success {
+    background-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #1e7e34;
+}
+
+/* ---------- Flash Messages ---------- */
 ul.flashes {
     background-color: #ffe6e6;
     border: 1px solid #ff9999;
@@ -61,4 +156,103 @@ ul.flashes {
     padding: 10px;
     border-radius: 4px;
     list-style-type: none;
+}
+
+/* ---------- Cards ---------- */
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    color: #2a5d84;
+    margin-bottom: 8px;
+}
+
+.card-subtitle {
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    font-size: 0.95rem;
+    color: #333;
+}
+
+/* ---------- Game Container ---------- */
+#game-container {
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+/* ---------- Alert Boxes ---------- */
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.alert-info {
+    background-color: #d9edf7;
+    color: #31708f;
+    border: 1px solid #bce8f1;
+}
+
+/* ---------- Badge Styles ---------- */
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-common { background: #e0e0e0; color: #333; }
+.badge-uncommon { background: #b2dfdb; color: #004d40; }
+.badge-rare { background: #90caf9; color: #0d47a1; }
+.badge-epic { background: #ce93d8; color: #4a148c; }
+.badge-legendary { background: #ffd700; color: #4d3500; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    form {
+        width: 100%;
+    }
+
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav a {
+        margin-bottom: 10px;
+    }
+}
+
+/* ---------- Footer ---------- */
+footer {
+    background-color: #333;
+    color: #eee;
+    text-align: center;
+    padding: 15px;
+    font-size: 0.9rem;
+    margin-top: 40px;
 }
