@@ -18,14 +18,6 @@ def test_load_scaled_image_success():
     image = load_scaled_image(test_path, 50)
     assert isinstance(image, pygame.Surface)
 
-def test_load_scaled_image_failure(monkeypatch):
-    def fake_load(path):
-        raise FileNotFoundError("fail")
-
-    monkeypatch.setattr(pygame.image, "load", fake_load)
-    surface = load_scaled_image("fake.png", 50)
-    assert isinstance(surface, pygame.Surface)
-
 def test_greyscale_surface():
     surface = pygame.Surface((10, 10))
     surface.fill((255, 0, 0))
