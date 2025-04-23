@@ -8,7 +8,8 @@ services:
       - "27017:27017"
 
   backend:
-    image: bt2181/webslingerz
+    build:
+      context: ./backend
     ports:
       - "5001:5001"
     environment:

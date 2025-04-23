@@ -66,7 +66,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: 22
-          source: "docker-compose.yml"
+          source: "."
           target: "/home/${{ secrets.USERNAME }}/app/"
 
       - name: Deploy to Digital Ocean droplet via password
@@ -79,4 +79,5 @@ jobs:
           script: |
             cd /home/${{ secrets.USERNAME }}/app/
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-            docker compose up --build -d
+            docker compose build --no-cache
+            docker compose up
