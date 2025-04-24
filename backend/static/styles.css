@@ -1,24 +1,27 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f8ff;
+    background-color: #c2ebeb;
     margin: 0;
     padding: 20px;
 }
 
 nav {
-    background-color: #333;
+    background-color: #f1cb8b;
+    border: solid 2px;
+    border-color: #d98836;
+    border-radius: 10px;
     padding: 10px;
     margin-bottom: 20px;
 }
 
 nav a {
-    color: white;
+    color: #a15115;
     margin-right: 15px;
     text-decoration: none;
 }
 
 nav a:hover {
-    text-decoration: underline;
+    text-decoration: #2a5d84;
 }
 
 h2 {
@@ -55,9 +58,9 @@ button:hover {
 }
 
 ul.flashes {
-    background-color: #ffe6e6;
-    border: 1px solid #ff9999;
-    color: #cc0000;
+    background-color: #e6fbff;
+    border: 1px solid #99c2ff;
+    color: #0300cc;
     padding: 10px;
     border-radius: 4px;
     list-style-type: none;

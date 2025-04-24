@@ -230,11 +230,11 @@ async def main():
     
     # Decoration prices
     deco_prices = {
-        "Bath": 100,
-        "Clock": 150,
-        "Froggy Fountain": 300,
-        "Lamp": 80,
-        "Sofa": 200
+        "Bath": 0,
+        "Clock": 0,
+        "Froggy Fountain": 0,
+        "Lamp": 0,
+        "Sofa": 0
     }
     
     # Rarity settings
@@ -281,10 +281,10 @@ async def main():
     
     DECO_SPAWN_POINTS = {
         "Lamp": (50, 320),
-        "Bath": (100, 100),  # NOT POSITIONED YET
+        "Bath": (320, 360), 
         "Clock": (100, 465),
-        "Froggy Fountain": (100, 100),  # NOT POSITIONED YET
-        "Sofa": (100, 100)  # NOT POSITIONED YET
+        "Froggy Fountain": (700, 390),  
+        "Sofa": (700, 135)  
     }
     
     # Game state
@@ -310,7 +310,7 @@ async def main():
         delta_time = clock.get_time() / 1000
         
         # Update gold in real time
-        gold += sum(b.gold_per_minute for b in collected_birds) * delta_time / 60
+        gold += sum(b.gold_per_minute for b in collected_birds) * delta_time 
         
         # Check for bird spawning
         if now - last_spawn_check >= 1:
