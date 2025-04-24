@@ -1,5 +1,23 @@
 import pygame
 import asyncio
+import js
+
+# After a bird is collected:
+js.fetch("/update-birds", {
+    "method": "POST",
+    "headers": js.Object.fromEntries([["Content-Type", "application/json"]]),
+    "body": js.JSON.stringify({
+        "birds": [b.name for b in collected_birds],
+    })
+})
+
+js.fetch("/update-money", {
+    "method": "POST",
+    "headers": js.Object.fromEntries([["Content-Type", "application/json"]]),
+    "body": js.JSON.stringify({
+        "money": int(gold)
+    })
+})
 
 async def main():
     pygame.init()
