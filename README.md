@@ -10,7 +10,7 @@
 # How to Run via Docker
 ### Full Application
 ```
-
+docker compose up --build
 ```
 
 
