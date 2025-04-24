@@ -66,7 +66,7 @@ async def show_birdiary(screen, collected_set, bird_types):
 
         pygame.draw.rect(birdiary_surface, (180, 80, 80), back_button, border_radius=6)
         back_text = font.render("Back", True, (255, 255, 255))
-        birdiary_surface.blit(back_text, (back_button.x + 20, back_button.y + 4))
+        birdiary_surface.blit(back_text, (back_button.x + 26, back_button.y + 2))
 
         screen.blit(birdiary_surface, (0, 0))
         pygame.display.flip()
@@ -124,7 +124,7 @@ async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco
 
         pygame.draw.rect(store_surface, (180, 80, 80), back_button, border_radius=6)
         back_text = font.render("Back", True, (255, 255, 255))
-        store_surface.blit(back_text, (back_button.x + 20, back_button.y + 4))
+        store_surface.blit(back_text, (back_button.x + 26, back_button.y + 2))
 
         gold_text = font.render(f"Gold: {int(gold)}", True, (80, 60, 20))
         store_surface.blit(gold_text, (20, 20))

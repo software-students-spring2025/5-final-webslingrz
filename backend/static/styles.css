@@ -1,6 +1,8 @@
 /* ---------- Base Styles ---------- */
 body {
     font-family: Arial, sans-serif;
+    background-image: url("webappforest.png");
+    background-size: cover;
     background-color: #c2ebeb;
     margin: 0;
     padding: 0;
@@ -8,26 +10,30 @@ body {
 
 /* ---------- Navbar ---------- */
 nav {
-    background-color: #f1cb8b;
-    border: solid 2px;
-    border-color: #d98836;
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 20px;
-    background-color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* optional for vertical alignment */
+    background-color: #e4a04d;
+    border: solid 2px #bd6e31;
     padding: 10px 20px;
     position: sticky;
     top: 0;
     z-index: 1000;
+}
+
+.nav-left,
+.nav-right {
     display: flex;
-    justify-content: flex-start;
     gap: 15px;
 }
 
+.nav-right {
+    margin-left: auto;
+}
+
 nav a {
-    color: #a15115;
     margin-right: 15px;
-    color: white;
+    color: #ffffff;
     text-decoration: none;
     font-weight: bold;
 }
@@ -40,7 +46,7 @@ nav a:hover {
 .container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;
 }
 
 .row {
@@ -201,7 +207,9 @@ ul.flashes {
     border-radius: 8px;
     overflow: hidden;
     margin: 0 auto;
-    max-width: 100%;
+    width: 934px;
+    height: 700px;
+    /* max-width: 100%; */
 }
 
 /* ---------- Alert Boxes ---------- */
@@ -263,4 +271,8 @@ footer {
     padding: 15px;
     font-size: 0.9rem;
     margin-top: 40px;
+}
+
+#game-container{
+    width: 934px;
 }
