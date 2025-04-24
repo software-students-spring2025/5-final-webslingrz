@@ -1,5 +1,5 @@
 # Webslingrz Final Project
-
+![backend.yaml]https://github.com/software-students-spring2025/5-final-webslingrz/actions/workflows/backend.yml/badge.svg?event=pull_request
 
 # Team
 * Brian Zou [Brian's Github](https://github.com/brianzou03)
@@ -10,7 +10,7 @@
 # How to Run via Docker
 ### Full Application
 ```
-
+docker compose up --build
 ```
 
 
@@ -110,4 +110,5 @@ View our task board [here](https://github.com/orgs/software-students-spring2025/
 * Docker
 * MongoDB
 * Digital Ocean
+
 

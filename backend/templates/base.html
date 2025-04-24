@@ -7,9 +7,14 @@
 </head>
 <body>
     <nav>
-        <a href="/dashboard">Dashboard</a> |
-        <a href="/birds">Bird Collection</a> |
-        <a href="/logout">Logout</a>
+        <div class="right-nav">
+            <a href="/dashboard">Dashboard</a> 
+            <a href="/birds">Bird Collection</a> 
+        </div>
+        <div class="left-nav">
+            <a href="/logout">Logout</a>
+        </div>
+        
     </nav>
 
     {% with messages = get_flashed_messages() %}
@@ -25,3 +30,4 @@
     {% block content %}{% endblock %}
 </body>
 </html>
+

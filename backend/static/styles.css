@@ -1,38 +1,52 @@
 /* ---------- Base Styles ---------- */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f8ff;
+    background-image: url("webappforest.png");
+    background-size: cover;
+    background-color: #c2ebeb;
     margin: 0;
     padding: 0;
 }
 
 /* ---------- Navbar ---------- */
 nav {
-    background-color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* optional for vertical alignment */
+    background-color: #e4a04d;
+    border: solid 2px #bd6e31;
     padding: 10px 20px;
     position: sticky;
     top: 0;
     z-index: 1000;
+}
+
+.nav-left,
+.nav-right {
     display: flex;
-    justify-content: flex-start;
     gap: 15px;
 }
 
+.nav-right {
+    margin-left: auto;
+}
+
 nav a {
-    color: white;
+    margin-right: 15px;
+    color: #ffffff;
     text-decoration: none;
     font-weight: bold;
 }
 
 nav a:hover {
-    text-decoration: underline;
+    text-decoration: #2a5d84;
 }
 
 /* ---------- Page Layout ---------- */
 .container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;
 }
 
 .row {
@@ -150,9 +164,9 @@ button:hover,
 
 /* ---------- Flash Messages ---------- */
 ul.flashes {
-    background-color: #ffe6e6;
-    border: 1px solid #ff9999;
-    color: #cc0000;
+    background-color: #e6fbff;
+    border: 1px solid #99c2ff;
+    color: #0300cc;
     padding: 10px;
     border-radius: 4px;
     list-style-type: none;
@@ -193,7 +207,9 @@ ul.flashes {
     border-radius: 8px;
     overflow: hidden;
     margin: 0 auto;
-    max-width: 100%;
+    width: 934px;
+    height: 700px;
+    /* max-width: 100%; */
 }
 
 /* ---------- Alert Boxes ---------- */
