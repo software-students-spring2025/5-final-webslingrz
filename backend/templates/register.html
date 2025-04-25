@@ -1,13 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Register</h2>
-<form method="POST">
-    <label>Username:</label>
-    <input type="text" name="username" required><br>
-    <label>Password:</label>
-    <input type="password" name="password" required><br>
-    <button type="submit">Register</button>
-</form>
-<p>Already have an account? <a href="/login">Log in</a></p>
+<div class="centering-body">
+    <img src="/static/regis_hook.png" class="hook">
+    <form method="POST" class="form-format">
+        <div class="form-row">
+            <input type="text" name="username" placeholder="Username" required><br> 
+        </div>
+        
+        <div class="form-row">
+        <input type="password" name="password" placeholder="Password" required><br>  
+        </div>
+        
+        <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="/login">Log in</a></p>
+</div>
+
 {% endblock %}

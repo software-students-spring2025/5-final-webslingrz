@@ -6,12 +6,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <nav>
-        <a href="/dashboard">Dashboard</a> |
-        <a href="/birds">Bird Collection</a> |
-        <a href="/logout">Logout</a>
-    </nav>
-
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <ul class="flashes">
@@ -21,7 +15,30 @@
             </ul>
         {% endif %}
     {% endwith %}
+    
+    {% block content %}{% endblock %}   
+  
+    
 
-    {% block content %}{% endblock %}
+    <audio id="bg-audio" loop>
+        <source src="/static/birdfish-happy-loop-6199.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
 </body>
 </html>
+
+<script>
+    const toggleBtn = document.getElementById('audio-toggle');
+    const audio = document.getElementById('bg-audio');
+    let isPlaying = false;
+
+    toggleBtn.addEventListener('click', () => {
+        if (isPlaying) {
+            audio.pause();
+        } else {
+            audio.play();
+        }
+        isPlaying = !isPlaying;
+    });
+</script>
+
