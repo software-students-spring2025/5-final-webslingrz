@@ -6,6 +6,7 @@ import numpy as np
 from datetime import datetime
 import asyncio
 import traceback
+from pygame import mixer 
 
 # Constants for game screen
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
@@ -133,7 +134,7 @@ async def show_birdiary(screen, collected_set, bird_types):
         return True  # Continue game despite error
 
 # Deco Store function
-async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco_spawn_points):
+async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco_spawn_points, deco_click_sound):
     try:
         store_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         font = pygame.font.SysFont("Arial", 22)
@@ -196,6 +197,7 @@ async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco
                         for rect, name in clickable_items:
                             if rect.collidepoint(event.pos) and name not in purchased_set:
                                 price = deco_prices[name]
+                                #deco_click_sound.play()
                                 if gold >= price:
                                     gold -= price
                                     purchased_set.add(name)
@@ -216,6 +218,15 @@ async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco
 async def main():
     try:
         pygame.init()
+        # mixer.init() 
+
+        # common_click_sound = mixer.Sound("assets/marimba-bloop-3-188151.mp3") 
+        # uncommon_click_sound = mixer.Sound("assets/marimba-bloop-1-188150.mp3") 
+        # rare_click_sound = mixer.Sound("assets/marimba-bloop-2-188149.mp3") 
+        # epic_click_sound = mixer.Sound("assets/marimba-ringtone-2-185153.mp3") 
+        # legendary_click_sound = mixer.Sound("assets/marimba-win-h-3-209697.mp3") 
+        # button_click_sound = mixer.Sound("assets/107136__bubaproducer__button-18.wav")
+        # deco_click_sound = mixer.Sound("assets/infographic-pop-4-197870.mp3")
         
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Bird Watching")
@@ -502,10 +513,14 @@ async def main():
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         if birdiary_button.collidepoint(event.pos):
                             collected_set = set(b.name for b in collected_birds)
+                            #button_click_sound.play()
                             game_status = await show_birdiary(screen, collected_set, bird_types)
+                            #button_click_sound.play()
                             running = game_status
                         elif store_button.collidepoint(event.pos):
-                            game_status, gold = await show_store(screen, purchased_deco, gold, deco_assets, deco_prices, DECO_SPAWN_POINTS)
+                            #button_click_sound.play()
+                            game_status, gold = await show_store(screen, purchased_deco, gold, deco_assets, deco_prices, DECO_SPAWN_POINTS, deco_click_sound)
+                            #button_click_sound.play()
                             running = game_status
                         else:
                             mx, my = event.pos
@@ -513,6 +528,22 @@ async def main():
                                 rect = obj["bird"].image.get_rect(topleft=obj["pos"])
                                 if rect.collidepoint(mx, my):
                                     collected_birds.append(obj["bird"])
+                                    print(obj["bird"].rarity)
+                                    if obj["bird"].rarity == "common":
+                                        print("should play sound!!!!!!!!!!!!!!!!!!!!!!!!!")
+                                        #common_click_sound.play() 
+                                    elif obj["bird"].rarity == "uncommon":
+                                        print("should play sound!!!!!!!!!!!!!!!!!!!!!!!!!")
+                                        #uncommon_click_sound.play() 
+                                    elif obj["bird"].rarity == "rare":
+                                        print("should play sound!!!!!!!!!!!!!!!!!!!!!!!!!")
+                                        #rare_click_sound.play()
+                                    elif obj["bird"].rarity == "epic":
+                                        print("should play sound!!!!!!!!!!!!!!!!!!!!!!!!!")
+                                        #epic_click_sound.play()
+                                    elif obj["bird"].rarity == "legendary":
+                                        print("should play sound!!!!!!!!!!!!!!!!!!!!!!!!!")
+                                        #legendary_click_sound.play()
                                     print(f"Collected: {obj['bird'].name} @ {datetime.now()}")
                                     occupied_spawn.discard(obj["pos"])
                                     spawned_birds.remove(obj)
