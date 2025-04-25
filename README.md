@@ -1,5 +1,5 @@
 # Webslingrz Final Project
-![backend.yaml]https://github.com/software-students-spring2025/5-final-webslingrz/actions/workflows/backend.yml/badge.svg?event=pull_request
+![backend.yaml](https://github.com/software-students-spring2025/5-final-webslingrz/actions/workflows/backend.yml/badge.svg?event=pull_request)
 
 # Team
 * Brian Zou [Brian's Github](https://github.com/brianzou03)
