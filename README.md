@@ -42,6 +42,18 @@ source venv/bin/activate
 ```
 
 ### Unit tests for web app
+A note about unit testing: bird_game.py is excluded via .coveragerc as bird_game contains advanced logic such as audio and visuals that are not meant to be unit tested
+#### coverage testing (run from root directory)
+```
+coverage erase
+
+coverage run -m pytest
+coverage html
+open htmlcov/index.html
+
+```
+
+
 #### main game loop test
 * test_bird_spawn_probability_logic
 * test_gold_accumulation_over_time
