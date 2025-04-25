@@ -281,10 +281,10 @@ async def main():
     
     DECO_SPAWN_POINTS = {
         "Lamp": (50, 320),
-        "Bath": (100, 100),  # NOT POSITIONED YET
+        "Bath": (320, 360), 
         "Clock": (100, 465),
-        "Froggy Fountain": (100, 100),  # NOT POSITIONED YET
-        "Sofa": (100, 100)  # NOT POSITIONED YET
+        "Froggy Fountain": (700, 390),  
+        "Sofa": (700, 135)  
     }
     
     # Game state

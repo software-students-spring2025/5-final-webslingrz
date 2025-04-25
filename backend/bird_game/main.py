@@ -24,6 +24,9 @@ def add_error_message(error_text):
         error_messages.pop(0)  # Remove oldest message if limit reached
     print(f"ERROR: {error_text}")
 
+def remove_error_message():
+    error_messages.clear()
+
 def draw_error_messages(screen, font):
     """Draw error messages on the screen"""
     if not error_messages:
@@ -104,7 +107,7 @@ async def show_birdiary(screen, collected_set, bird_types):
 
             pygame.draw.rect(birdiary_surface, (180, 80, 80), back_button, border_radius=6)
             back_text = font.render("Back", True, (255, 255, 255))
-            birdiary_surface.blit(back_text, (back_button.x + 20, back_button.y + 4))
+            birdiary_surface.blit(back_text, (back_button.x + 24, back_button.y + 2))
 
             screen.blit(birdiary_surface, (0, 0))
             
@@ -116,6 +119,7 @@ async def show_birdiary(screen, collected_set, bird_types):
                 if event.type == pygame.QUIT:
                     return False
                 elif event.type == pygame.MOUSEBUTTONDOWN and back_button.collidepoint(event.pos):
+                    remove_error_message()
                     running = False
                 elif event.type == pygame.MOUSEWHEEL:
                     scroll_offset -= event.y * scroll_speed
@@ -170,7 +174,7 @@ async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco
 
             pygame.draw.rect(store_surface, (180, 80, 80), back_button, border_radius=6)
             back_text = font.render("Back", True, (255, 255, 255))
-            store_surface.blit(back_text, (back_button.x + 20, back_button.y + 4))
+            store_surface.blit(back_text, (back_button.x + 24, back_button.y + 2))
 
             gold_text = font.render(f"Gold: {int(gold)}", True, (80, 60, 20))
             store_surface.blit(gold_text, (20, 20))
@@ -186,6 +190,7 @@ async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco
                     return False, gold
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if back_button.collidepoint(event.pos):
+                        remove_error_message()
                         running = False
                     else:
                         for rect, name in clickable_items:
@@ -281,12 +286,20 @@ async def main():
             deco_path = os.path.join(BASE_DIR, f"assets/decoration/{file}")
             deco_assets[name] = load_scaled_image(deco_path, target_deco_width)
         
+        # deco_prices = {
+        #     "Bath": 1000,
+        #     "Clock": 200,
+        #     "Froggy Fountain": 10000,
+        #     "Lamp": 100,
+        #     "Sofa": 500
+        # }
+
         deco_prices = {
-            "Bath": 100,
-            "Clock": 150,
-            "Froggy Fountain": 300,
-            "Lamp": 80,
-            "Sofa": 200
+            "Bath": 0,
+            "Clock": 0,
+            "Froggy Fountain": 0,
+            "Lamp": 0,
+            "Sofa": 0
         }
         
         rarity_tiers = {
@@ -331,10 +344,10 @@ async def main():
         
         DECO_SPAWN_POINTS = {
             "Lamp": (50, 320),
-            "Bath": (100, 100),  # NOT POSITIONED YET
+            "Bath": (320, 360), 
             "Clock": (100, 465),
-            "Froggy Fountain": (100, 100),  # NOT POSITIONED YET
-            "Sofa": (100, 100)  # NOT POSITIONED YET
+            "Froggy Fountain": (700, 390),  
+            "Sofa": (700, 135)  
         }
         
         spawned_birds = []
@@ -343,6 +356,11 @@ async def main():
         gold = 0
         last_spawn_check = time.time()
         occupied_spawn = set()
+        lamp = False
+        bath = False
+        clock = False
+        fountain = False
+        sofa = False
         
         FONT = pygame.font.SysFont("Arial", 24)
         BUTTON_FONT = pygame.font.SysFont("Arial", 20)
@@ -358,7 +376,7 @@ async def main():
                 now = time.time()
                 delta_time = clock.get_time() / 1000
                 
-                gold += sum(b.gold_per_minute for b in collected_birds) * delta_time / 60
+                gold += sum(b.gold_per_minute for b in collected_birds) * delta_time 
                 
                 if now - last_spawn_check >= 1:
                     unoccupied_spawn = [spawn for spawn in SPAWN_POINTS if spawn not in occupied_spawn]
@@ -376,6 +394,90 @@ async def main():
                 
                 for deco in purchased_deco:
                     if deco in deco_assets and deco in DECO_SPAWN_POINTS:
+                        if not lamp and deco == "Lamp":
+                            rarity_tiers["common"]["spawn_chance"] = 0.05
+                            print("altered rarity")
+                            bird_types = []
+                            for rarity, names in rarity_assignments.items():
+                                for name in names:
+                                    if name in bird_assets:
+                                        bird_types.append(Bird(
+                                            name,
+                                            bird_assets[name],
+                                            rarity_tiers[rarity]["gold_per_sec"] * 60,
+                                            rarity_tiers[rarity]["spawn_chance"],
+                                            rarity
+                                        ))
+                            lamp = True
+                        elif not bath and deco == "Bath":
+                            rarity_tiers["epic"]["spawn_chance"] = 0.005
+                            print("altered rarity")
+                            bird_types = []
+                            for rarity, names in rarity_assignments.items():
+                                for name in names:
+                                    if name in bird_assets:
+                                        bird_types.append(Bird(
+                                            name,
+                                            bird_assets[name],
+                                            rarity_tiers[rarity]["gold_per_sec"] * 60,
+                                            rarity_tiers[rarity]["spawn_chance"],
+                                            rarity
+                                        ))
+                            bath = True
+                        elif not clock and deco == "Clock":
+                            rarity_tiers["uncommon"]["spawn_chance"] = 0.04
+                            print("altered rarity")
+                            bird_types = []
+                            for rarity, names in rarity_assignments.items():
+                                for name in names:
+                                    if name in bird_assets:
+                                        bird_types.append(Bird(
+                                            name,
+                                            bird_assets[name],
+                                            rarity_tiers[rarity]["gold_per_sec"] * 60,
+                                            rarity_tiers[rarity]["spawn_chance"],
+                                            rarity
+                                        ))
+                            clock = True
+                        elif not fountain and deco == "Froggy Fountain":
+                            rarity_tiers["legendary"]["spawn_chance"] =  0.05
+                            print("altered rarity")
+                            print(rarity_tiers["legendary"]["spawn_chance"])
+                            bird_types = []
+                            for rarity, names in rarity_assignments.items():
+                                for name in names:
+                                    if name in bird_assets:
+                                        bird_types.append(Bird(
+                                            name,
+                                            bird_assets[name],
+                                            rarity_tiers[rarity]["gold_per_sec"] * 60,
+                                            rarity_tiers[rarity]["spawn_chance"],
+                                            rarity
+                                        ))
+                            fountain = True
+                        elif not sofa and deco == "Sofa":
+                            rarity_tiers["rare"]["spawn_chance"] = 0.033
+                            print("altered rarity")
+                            bird_types = []
+                            for rarity, names in rarity_assignments.items():
+                                for name in names:
+                                    if name in bird_assets:
+                                        bird_types.append(Bird(
+                                            name,
+                                            bird_assets[name],
+                                            rarity_tiers[rarity]["gold_per_sec"] * 60,
+                                            rarity_tiers[rarity]["spawn_chance"],
+                                            rarity
+                                        ))
+                            sofa = True
+
+                        # rarity_tiers = {
+                        #    "common": {"spawn_chance": 0.10, "gold_per_sec": 0.01},
+                        #    "uncommon": {"spawn_chance": 0.033, "gold_per_sec": 0.05},
+                        #    "rare": {"spawn_chance": 0.0083, "gold_per_sec": 0.10},
+                        #    "epic": {"spawn_chance": 0.0017, "gold_per_sec": 0.20},
+                        #    "legendary": {"spawn_chance": 0.00055, "gold_per_sec": 1.00},
+                        # }
                         screen.blit(deco_assets[deco], DECO_SPAWN_POINTS[deco])
                 
                 gold_text = FONT.render(f"Gold: {int(gold)}", True, (255, 255, 0))
