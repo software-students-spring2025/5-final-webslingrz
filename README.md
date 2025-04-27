@@ -1,5 +1,5 @@
 # Webslingrz Final Project
-
+![backend.yaml](https://github.com/software-students-spring2025/5-final-webslingrz/actions/workflows/backend.yml/badge.svg?event=pull_request)
 
 # Team
 * Brian Zou [Brian's Github](https://github.com/brianzou03)
@@ -10,7 +10,7 @@
 # How to Run via Docker
 ### Full Application
 ```
-
+docker compose up --build
 ```
 
 
@@ -42,6 +42,18 @@ source venv/bin/activate
 ```
 
 ### Unit tests for web app
+A note about unit testing: bird_game.py is excluded via .coveragerc as bird_game contains advanced logic such as audio and visuals that are not meant to be unit tested
+#### coverage testing (run from root directory)
+```
+coverage erase
+
+coverage run -m pytest
+coverage html
+open htmlcov/index.html
+
+```
+
+
 #### main game loop test
 * test_bird_spawn_probability_logic
 * test_gold_accumulation_over_time
@@ -110,4 +122,5 @@ View our task board [here](https://github.com/orgs/software-students-spring2025/
 * Docker
 * MongoDB
 * Digital Ocean
+
 
