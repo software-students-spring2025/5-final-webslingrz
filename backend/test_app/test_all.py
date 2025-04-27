@@ -1,11 +1,11 @@
 import pytest
 from flask import session
 from werkzeug.security import generate_password_hash
-from app import app
-from game import bp as game_bp
-import app as app_module
-import game as game_module
-import auth as auth_module
+from backend.app import app
+from backend.game import bp as game_bp
+import backend.app as app_module
+import backend.game as game_module
+import backend.auth as auth_module
 
 # ---------------------- Fixtures ----------------------
 

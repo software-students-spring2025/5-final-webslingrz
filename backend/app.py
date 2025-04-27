@@ -23,8 +23,8 @@ def home():
     return redirect('/dashboard')
 
 def register_blueprints():
-    import auth
-    import game
+    from backend import auth
+    from backend import game
     app.register_blueprint(auth.bp)
     app.register_blueprint(game.bp)
 
