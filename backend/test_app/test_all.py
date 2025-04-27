@@ -68,9 +68,10 @@ def test_birds_authed(authed_client, monkeypatch):
     res = authed_client.get("/birds")
     assert b"Duckling" in res.data
 
-def test_play_requires_login(client):
-    res = client.get("/play", follow_redirects=True)
-    assert b"Login" in res.data
+def test_update_birds(client):
+    # Unauthorized
+    res = client.post("/update-birds", json={"birds": []})
+    assert res.status_code == 401
 
 def test_update_money(client):
     # Unauthorized
