@@ -5,7 +5,7 @@ services:
     image: mongo
     container_name: mongodb
     ports:
-      - "5001:5001"
+      - "27017:27017"
   backend:
     build:
       context: ./backend
