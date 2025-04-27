@@ -4,11 +4,13 @@ services:
   mongodb:
     image: mongo
     container_name: mongodb
+    ports:
+      - "5001:5001"
   backend:
     build:
       context: ./backend
     ports:
-      - "8080:8080"
+      - "5001:5001"
     environment:
       - MONGO_URI=mongodb://mongodb:27017/birdgame
       - SECRET_KEY=devsecret
