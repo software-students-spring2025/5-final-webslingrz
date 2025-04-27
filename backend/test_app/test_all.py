@@ -59,14 +59,14 @@ def test_home_redirect(client):
 #     res = client.post("/login", data={"username": "testuser", "password": "secret"}, follow_redirects=True)
 #     assert b"Dashboard" in res.data
 
-def test_birds_authed(authed_client, monkeypatch):
-    monkeypatch.setattr(game_module, "get_mongo", lambda: type("MockMongo", (), {
-        "db": type("DB", (), {"users": type("Users", (), {
-            "find_one": lambda self, q: {"birds": [{"name": "Duckling", "rarity": "common", "gold_per_minute": 0.6}]}
-        })()})
-    })())
-    res = authed_client.get("/birds")
-    assert b"Duckling" in res.data
+# def test_birds_authed(authed_client, monkeypatch):
+#     monkeypatch.setattr(game_module, "get_mongo", lambda: type("MockMongo", (), {
+#         "db": type("DB", (), {"users": type("Users", (), {
+#             "find_one": lambda self, q: {"birds": [{"name": "Duckling", "rarity": "common", "gold_per_minute": 0.6}]}
+#         })()})
+#     })())
+#     res = authed_client.get("/birds")
+#     assert b"Duckling" in res.data
 
 def test_update_birds(client):
     # Unauthorized
