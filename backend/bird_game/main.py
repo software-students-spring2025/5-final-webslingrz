@@ -197,7 +197,7 @@ async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco
                         for rect, name in clickable_items:
                             if rect.collidepoint(event.pos) and name not in purchased_set:
                                 price = deco_prices[name]
-                                #deco_click_sound.play()
+                                deco_click_sound.play()
                                 if gold >= price:
                                     gold -= price
                                     purchased_set.add(name)
