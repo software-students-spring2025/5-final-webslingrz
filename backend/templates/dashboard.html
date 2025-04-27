@@ -21,7 +21,7 @@
     </div> -->
     <div class="container-inner">
         <div class="column left">
-            <img src="static/space_ad.png" class="ad" id="left-ad">
+            <img src="static/space_ad.png" class="banner" id="left-banner">
         </div>
         <div class="column middle">
             <div id="game-container" style="height: 700px; border: 2px solid #3498db; border-radius: 10px; margin: 0 auto;">
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="column right">
-            <img src="static/fountain_ad.png" class="ad" id="right-ad">
+            <img src="static/fountain_ad.png" class="banner" id="right-banner">
         </div>
     </div>    
     
@@ -72,8 +72,8 @@
         });
     });
 
-    leftAd = document.getElementById("left-ad");
-    rightAd = document.getElementById("right-ad");
+    leftBanner = document.getElementById("left-banner");
+    rightBanner = document.getElementById("right-banner");
 
     const imageSources = [
         "static/birds_ad.png",
@@ -86,8 +86,8 @@
     function changeImage() {
         const randomIndex1 = Math.floor(Math.random() * imageSources.length);
         const randomIndex2 = Math.floor(Math.random() * imageSources.length);
-        leftAd.src = imageSources[randomIndex1];
-        rightAd.src = imageSources[randomIndex2];
+        leftBanner.src = imageSources[randomIndex1];
+        rightBanner.src = imageSources[randomIndex2];
     }
 
     setInterval(changeImage, 30000);
