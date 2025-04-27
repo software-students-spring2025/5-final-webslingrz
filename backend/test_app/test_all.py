@@ -146,19 +146,19 @@ def test_update_birds(client):
 # ---------------------- Utilities ----------------------
 
 def test_load_scaled_image(monkeypatch):
-    import bird_game
+    import bird_game.main
     class DummyImg:
         def get_height(self): return 100
         def get_width(self): return 100
     monkeypatch.setattr("pygame.image.load", lambda p: DummyImg())
     monkeypatch.setattr("pygame.transform.scale", lambda img, size: "scaled")
-    result = bird_game.load_scaled_image("fakepath", 50)
+    result = bird_game.main.load_scaled_image("fakepath", 50)
     assert result == "scaled"
 
 def test_greyscale_surface():
     import pygame
-    import bird_game
+    import bird_game.main
     surface = pygame.Surface((10, 10))
     surface.fill((255, 255, 255))
-    grey = bird_game.greyscale_surface(surface)
+    grey = bird_game.main.greyscale_surface(surface)
     assert isinstance(grey, pygame.Surface)

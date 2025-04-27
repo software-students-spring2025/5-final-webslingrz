@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from bird_game import greyscale_surface, load_scaled_image
+from bird_game.main import greyscale_surface, load_scaled_image
 import pygame
 
 @pytest.fixture(scope="module", autouse=True)
