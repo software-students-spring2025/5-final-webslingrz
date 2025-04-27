@@ -297,21 +297,21 @@ async def main():
             deco_path = os.path.join(BASE_DIR, f"assets/decoration/{file}")
             deco_assets[name] = load_scaled_image(deco_path, target_deco_width)
         
-        # deco_prices = {
-        #     "Bath": 1000,
-        #     "Clock": 200,
-        #     "Froggy Fountain": 10000,
-        #     "Lamp": 100,
-        #     "Sofa": 500
-        # }
-
         deco_prices = {
-            "Bath": 0,
-            "Clock": 0,
-            "Froggy Fountain": 0,
-            "Lamp": 0,
-            "Sofa": 0
+            "Bath": 1000,
+            "Clock": 200,
+            "Froggy Fountain": 10000,
+            "Lamp": 100,
+            "Sofa": 500
         }
+
+        # deco_prices = {
+        #     "Bath": 0,
+        #     "Clock": 0,
+        #     "Froggy Fountain": 0,
+        #     "Lamp": 0,
+        #     "Sofa": 0
+        # }
         
         rarity_tiers = {
             "common": {"spawn_chance": 0.10, "gold_per_sec": 0.01},
