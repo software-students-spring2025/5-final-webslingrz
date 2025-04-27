@@ -346,6 +346,7 @@ a {
 
 .left, .right {
     flex: 1;
+    display: block !important;
 }
 
 .middle {
