@@ -7,7 +7,7 @@ import backend.app as app_module
 import backend.game as game_module
 import backend.auth as auth_module
 
-# ---------------------- Fixtures ----------------------
+# # ---------------------- Fixtures ----------------------
 
 @pytest.fixture
 def client():
@@ -29,7 +29,7 @@ def test_home_redirect(client):
     assert res.status_code == 302
     assert '/dashboard' in res.headers['Location']
 
-# ---------------------- Auth.py Tests ----------------------
+# # ---------------------- Auth.py Tests ----------------------
 
 # def test_register_and_login_flow(client, monkeypatch):
 #     fake_users = {}
@@ -59,17 +59,24 @@ def test_home_redirect(client):
 #     res = client.post("/login", data={"username": "testuser", "password": "secret"}, follow_redirects=True)
 #     assert b"Dashboard" in res.data
 
-def test_logout(client):
-    with client.session_transaction() as sess:
-        sess["user_id"] = "mockid"
-    res = client.get("/logout", follow_redirects=True)
-    assert b"Login" in res.data
+def test_birds_authed(authed_client, monkeypatch):
+    monkeypatch.setattr(game_module, "get_mongo", lambda: type("MockMongo", (), {
+        "db": type("DB", (), {"users": type("Users", (), {
+            "find_one": lambda self, q: {"birds": [{"name": "Duckling", "rarity": "common", "gold_per_minute": 0.6}]}
+        })()})
+    })())
+    res = authed_client.get("/birds")
+    assert b"Duckling" in res.data
 
-# ---------------------- Game.py Tests ----------------------
+def test_update_birds(client):
+    # Unauthorized
+    res = client.post("/update-birds", json={"birds": []})
+    assert res.status_code == 401
 
-def test_dashboard_redirects_if_not_logged_in(client):
-    res = client.get("/dashboard", follow_redirects=True)
-    assert b"Login" in res.data
+def test_update_money(client):
+    # Unauthorized
+    res = client.post("/update-money", json={"money": 100})
+    assert res.status_code == 401
 
 # def test_dashboard_authed(authed_client, monkeypatch):
 #     monkeypatch.setattr(game_module, "get_mongo", lambda: type("MockMongo", (), {
@@ -89,9 +96,10 @@ def test_dashboard_redirects_if_not_logged_in(client):
 #     res = authed_client.get("/birds")
 #     assert b"Duckling" in res.data
 
-def test_play_requires_login(client):
-    res = client.get("/play", follow_redirects=True)
-    assert b"Login" in res.data
+def test_update_birds(client):
+    # Unauthorized
+    res = client.post("/update-birds", json={"birds": []})
+    assert res.status_code == 401
 
 # def test_update_money(client):
 #     # Unauthorized
@@ -138,19 +146,19 @@ def test_play_requires_login(client):
 # ---------------------- Utilities ----------------------
 
 def test_load_scaled_image(monkeypatch):
-    import bird_game
+    import bird_game.main
     class DummyImg:
         def get_height(self): return 100
         def get_width(self): return 100
     monkeypatch.setattr("pygame.image.load", lambda p: DummyImg())
     monkeypatch.setattr("pygame.transform.scale", lambda img, size: "scaled")
-    result = bird_game.load_scaled_image("fakepath", 50)
+    result = bird_game.main.load_scaled_image("fakepath", 50)
     assert result == "scaled"
 
 def test_greyscale_surface():
     import pygame
-    import bird_game
+    import bird_game.main
     surface = pygame.Surface((10, 10))
     surface.fill((255, 255, 255))
-    grey = bird_game.greyscale_surface(surface)
+    grey = bird_game.main.greyscale_surface(surface)
     assert isinstance(grey, pygame.Surface)
