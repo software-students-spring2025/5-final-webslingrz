@@ -32,8 +32,8 @@ docker compose up --build
 ```
 
 
-# Running without Docker (Mac instructions)
-## Web App
+# Running without Docker
+## Web App (Mac)
 ```
 python3 -m venv venv
 source venv/bin/activate 
@@ -48,6 +48,16 @@ brew services cleanup
 brew services start mongodb/brew/mongodb-community
 cd ..
 ./venv/bin/python backend/app.py
+```
+
+## Web App (Windows)
+```
+python -m venv venv
+venv/bin/activate 
+cd backend
+pip install -r requirements.txt
+Install Mongodb and ensure it is running in services.msc
+python app.py
 ```
 
 Visit localhost via: http://127.0.0.1:5001
