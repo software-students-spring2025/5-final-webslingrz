@@ -180,8 +180,8 @@ def update_birds():
         return jsonify({"success": False, "message": "Invalid data"}), 400
     
     try:
-        from app import get_mongo
-        mongo = get_mongo()
+        # from app import get_mongo
+        # mongo = get_mongo()
         
         # Update the user's birds collection
         mongo.db.users.update_one(
