@@ -111,9 +111,9 @@ async def show_birdiary(screen, collected_set, bird_types):
             birdiary_surface.blit(back_text, (back_button.x + 24, back_button.y + 2))
 
             screen.blit(birdiary_surface, (0, 0))
-            
+
             draw_error_messages(screen, error_font)
-            
+
             pygame.display.flip()
 
             for event in pygame.event.get():
@@ -125,9 +125,9 @@ async def show_birdiary(screen, collected_set, bird_types):
                 elif event.type == pygame.MOUSEWHEEL:
                     scroll_offset -= event.y * scroll_speed
                     scroll_offset = max(0, min(scroll_offset, max_scroll))
-                    
+
             await asyncio.sleep(0)
-        
+
         return True
     except Exception as e:
         add_error_message(f"Birdiary error: {str(e)}")
@@ -164,7 +164,7 @@ async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco
                 img = image if name in purchased_set else greyscale_surface(image)
                 img = pygame.transform.scale(img, (50, 50))
                 store_surface.blit(img, (40, y))
-                
+
                 status = "Purchased" if name in purchased_set else f"{deco_prices[name]} gold"
                 desc = f"{name}  |  {status}"
                 rendered = font.render(desc, True, (30, 30, 30))
@@ -181,9 +181,9 @@ async def show_store(screen, purchased_set, gold, deco_assets, deco_prices, deco
             store_surface.blit(gold_text, (20, 20))
 
             screen.blit(store_surface, (0, 0))
-            
+
             draw_error_messages(screen, error_font)
-            
+
             pygame.display.flip()
 
             for event in pygame.event.get():
