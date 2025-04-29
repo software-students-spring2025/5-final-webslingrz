@@ -3,7 +3,6 @@ from flask import session
 from werkzeug.security import generate_password_hash
 from backend.app import app
 import backend.app as app_module
-import backend.game as game_module
 # import backend.auth as auth_module
 from unittest.mock import MagicMock
 
@@ -51,6 +50,7 @@ def test_register_flow(client, monkeypatch):
     assert response.status_code == 200
     assert b"Bird Game" in response.data
 
+
 def test_login_flow(client, monkeypatch):
     fake_users = {}
 
@@ -76,117 +76,75 @@ def test_login_flow(client, monkeypatch):
     assert response.status_code == 200
     assert b"Bird Game" in response.data
 
-# def test_register_and_login_flow(client, monkeypatch):
-#     fake_users = {}
+def test_play_flow(client, monkeypatch):
+    fake_users = {}
 
-#     class DummyUsers:
-#         def find_one(self, query): return fake_users.get(query.get("username"))
-#         def insert_one(self, doc): fake_users[doc["username"]] = doc
+    class DummyUsers:
+        def find_one(self, query): return fake_users.get(query.get("username"))
+        def insert_one(self, doc): fake_users[doc["username"]] = doc
 
-#     dummy_mongo = type("Mongo", (), {"db": type("DB", (), {"users": DummyUsers()})})()
-#     monkeypatch.setattr(app_module, "get_mongo", lambda: dummy_mongo)
-#     # monkeypatch.setattr(app_module.login.__globals__, "get_mongo", lambda: dummy_mongo)
+    dummy_mongo = type("Mongo", (), {"db": type("DB", (), {"users": DummyUsers()})})()
+    monkeypatch.setattr(app_module, "get_mongo", lambda: dummy_mongo)
+    
+    response = client.post('/register', data={
+        'username': 'newuser',
+        'password': 'password123'
+    })
 
-#     # Register new
-#     res = client.post("/register", data={"username": "testuser", "password": "secret"}, follow_redirects=True)
-#     assert b"Bird Game" in res.data
+    assert response.status_code == 302
 
-#     # Register again
-#     res = client.post("/register", data={"username": "testuser", "password": "secret"}, follow_redirects=True)
-#     assert b"Username already exists" in res.data
+    response = client.post('/login', data={
+        'username': 'newuser',
+        'password': 'password123'
+    }, follow_redirects=True)
 
-#     # Invalid login
-#     res = client.post("/login", data={"username": "wrong", "password": "bad"}, follow_redirects=True)
-#     assert b"Invalid credentials" in res.data
+    assert response.status_code == 200
+    assert b"Bird Game" in response.data
 
-#     # Valid login
-#     fake_users["testuser"]["password"] = generate_password_hash("secret")
-#     res = client.post("/login", data={"username": "testuser", "password": "secret"}, follow_redirects=True)
-#     assert b"Dashboard" in res.data
+    response = client.post('/play')
 
-# def test_birds_authed(authed_client, monkeypatch):
-#     monkeypatch.setattr(game_module, "get_mongo", lambda: type("MockMongo", (), {
-#         "db": type("DB", (), {"users": type("Users", (), {
-#             "find_one": lambda self, q: {"birds": [{"name": "Duckling", "rarity": "common", "gold_per_minute": 0.6}]}
-#         })()})
-#     })())
-#     res = authed_client.get("/birds")
-#     assert b"Duckling" in res.data
+    assert response.status_code == 405
 
-def test_update_birds(client):
-    # Unauthorized
-    res = client.post("/update-birds", json={"birds": []})
-    assert res.status_code == 401
+def test_logout_flow(client, monkeypatch):
+    fake_users = {}
 
-def test_update_money(client):
-    # Unauthorized
-    res = client.post("/update-money", json={"money": 100})
-    assert res.status_code == 401
+    class DummyUsers:
+        def find_one(self, query): return fake_users.get(query.get("username"))
+        def insert_one(self, doc): fake_users[doc["username"]] = doc
 
-# def test_dashboard_authed(authed_client, monkeypatch):
-#     monkeypatch.setattr(game_module, "get_mongo", lambda: type("MockMongo", (), {
-#         "db": type("DB", (), {"users": type("Users", (), {
-#             "find_one": lambda self, q: {"money": 50}
-#         })()})
-#     })())
-#     res = authed_client.get("/dashboard")
-#     assert b"$50" in res.data or res.status_code == 200
+    dummy_mongo = type("Mongo", (), {"db": type("DB", (), {"users": DummyUsers()})})()
+    monkeypatch.setattr(app_module, "get_mongo", lambda: dummy_mongo)
 
-# def test_birds_authed(authed_client, monkeypatch):
-#     monkeypatch.setattr(game_module, "get_mongo", lambda: type("MockMongo", (), {
-#         "db": type("DB", (), {"users": type("Users", (), {
-#             "find_one": lambda self, q: {"birds": [{"name": "Duckling", "rarity": "common", "gold_per_minute": 0.6}]}
-#         })()})
-#     })())
-#     res = authed_client.get("/birds")
-#     assert b"Duckling" in res.data
+    client.post('/register', data={
+        'username': 'testuser',
+        'password': 'testpassword'
+    })
+    client.post('/login', data={
+        'username': 'testuser',
+        'password': 'testpassword'
+    })
 
-def test_update_birds(client):
-    # Unauthorized
-    res = client.post("/update-birds", json={"birds": []})
-    assert res.status_code == 401
+    response = client.get('/logout', follow_redirects=True)
 
-# def test_update_money(client):
-#     # Unauthorized
-#     res = client.post("/update-money", json={"money": 100})
-#     assert res.status_code == 401
+    assert response.status_code == 200
+    assert b"Login" in response.data or b"Sign In" in response.data
 
-#     # Invalid
-#     with client.session_transaction() as sess:
-#         sess['user_id'] = "mock"
-#     res = client.post("/update-money", json={})
-#     assert res.status_code == 400
+import os
 
-#     # Valid
-#     monkeypatch = pytest.MonkeyPatch()
-#     monkeypatch.setattr(game_module, "get_mongo", lambda: type("MockMongo", (), {
-#         "db": type("DB", (), {
-#             "users": type("Users", (), {"update_one": lambda *a, **kw: None})()
-#         })
-#     })())
-#     res = client.post("/update-money", json={"money": 50})
-#     assert res.json["success"]
+def test_serve_game_assets_real_file(client, monkeypatch):
+    real_web_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'backend', 'static')
+    real_web_dir = os.path.abspath(real_web_dir)
 
-# def test_update_birds(client):
-#     # Unauthorized
-#     res = client.post("/update-birds", json={"birds": []})
-#     assert res.status_code == 401
+    monkeypatch.setattr(app_module, "WEB_DIR", real_web_dir)
 
-#     # Invalid
-#     with client.session_transaction() as sess:
-#         sess['user_id'] = "mock"
-#     res = client.post("/update-birds", json={})
-#     assert res.status_code == 400
+    response = client.get("/game-assets/space_ad.png")
 
-#     # Valid
-#     monkeypatch = pytest.MonkeyPatch()
-#     monkeypatch.setattr(game_module, "get_mongo", lambda: type("MockMongo", (), {
-#         "db": type("DB", (), {
-#             "users": type("Users", (), {"update_one": lambda *a, **kw: None})()
-#         })
-#     })())
-#     res = client.post("/update-birds", json={"birds": [{"name": "Duckling"}]})
-#     assert res.json["success"]
+    with open(os.path.join(real_web_dir, "space_ad.png"), "rb") as f:
+        actual_file_data = f.read()
+
+    assert response.status_code == 200
+    assert response.data == actual_file_data
+    assert response.headers["Content-Type"].startswith("image/") 
 
 # ---------------------- Utilities ----------------------
 

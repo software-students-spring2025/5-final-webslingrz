@@ -132,4 +132,3 @@ def test_register_existing_user(mock_mongo, client):
     }, follow_redirects=True)
 
     assert response.status_code == 200
-    # assert '/register' in response.headers['Location']
