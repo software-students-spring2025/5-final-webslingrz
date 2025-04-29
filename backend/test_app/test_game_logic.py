@@ -302,7 +302,6 @@ async def test_main_purchase_all_decor(monkeypatch):
     monkeypatch.setattr(pygame.mixer, "init", lambda: None)
     monkeypatch.setattr(pygame.mixer, "Sound", lambda *args, **kwargs: mock.Mock(play=lambda: None))
 
-    # Sequence of deco purchases
     decorations_to_buy = ["Lamp", "Bath", "Clock", "Froggy Fountain", "Sofa"]
     purchase_index = {"index": 0}
 
@@ -315,7 +314,6 @@ async def test_main_purchase_all_decor(monkeypatch):
     monkeypatch.setattr(game_main, "show_store", fake_show_store)
     monkeypatch.setattr(game_main, "show_birdiary", mock.AsyncMock(return_value=True))
 
-    # simulate clicking "store" 5 times to buy everything, then quit
     store_click = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"pos": (650, 70)})
     quit_event = pygame.event.Event(pygame.QUIT)
 
