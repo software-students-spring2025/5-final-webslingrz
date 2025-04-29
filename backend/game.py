@@ -3,6 +3,8 @@ from bson.objectid import ObjectId
 import os
 import subprocess
 import shutil
+from backend.app import get_mongo
+mongo = get_mongo()
 
 bp = Blueprint('game', __name__)
 
@@ -16,8 +18,8 @@ WEB_DIR = os.path.join(BUILD_DIR, "web")
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
-    from app import get_mongo
-    mongo = get_mongo()
+    # from app import get_mongo
+    # mongo = get_mongo()
     user = mongo.db.users.find_one({"_id": ObjectId(session['user_id'])})
     return render_template('dashboard.html', money=user.get('money', 0))
 
@@ -25,8 +27,8 @@ def dashboard():
 def birds():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
-    from app import get_mongo
-    mongo = get_mongo()
+    # from app import get_mongo
+    # mongo = get_mongo()
     user = mongo.db.users.find_one({"_id": ObjectId(session['user_id'])})
     return render_template('birds.html', birds=user.get('birds', []))
 
@@ -98,8 +100,8 @@ def update_money():
         return jsonify({"success": False, "message": "Invalid data"}), 400
     
     try:
-        from app import get_mongo
-        mongo = get_mongo()
+        # from app import get_mongo
+        # mongo = get_mongo()
         
         # Update the user's money
         mongo.db.users.update_one(
@@ -122,8 +124,8 @@ def update_birds():
         return jsonify({"success": False, "message": "Invalid data"}), 400
     
     try:
-        from app import get_mongo
-        mongo = get_mongo()
+        # from app import get_mongo
+        # mongo = get_mongo()
         
         # Update the user's birds collection
         mongo.db.users.update_one(
