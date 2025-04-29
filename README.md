@@ -8,10 +8,22 @@
 * Bryant To [Bryant's Github](https://github.com/bryantto08)
 
 # About
+### Silly game about silly birds!
+Do you like birds but you wish they wouldn't fly away the moment you got near them? Do you wonder if there is a way to interact with these silly goobers at comfort of your desk? Then this game is for you!  
+  
+Birds will spawn on your screen. Click them to add them to your collection!  
+  
+Keep track of the birds you collected with the Birdiary!  
+  
+Just like in real life, your collected birds will generate gold.  
+  
+Use this gold to buy decoration to drip out your desktop and attract rarer birds!  
+  
+Buy the Froggy Fountain to become worthy of the bird who stands above all other birds...  
 
 # Subsystems
 * Mongodb: [Docker Hub](https://hub.docker.com/_/mongo)
-* Flask/Pygame: [Docker Hub](https://hub.docker.com/repository/docker/bt2181/webslingerz/general)
+* Flask/Pygame: [Docker Hub](https://hub.docker.com/r/bt2181/webslingerz)
 
 # How to Run via Docker
 ### Full Application
