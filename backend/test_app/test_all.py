@@ -3,7 +3,6 @@ from flask import session
 from werkzeug.security import generate_password_hash
 from backend.app import app
 import backend.app as app_module
-import backend.game as game_module
 # import backend.auth as auth_module
 from unittest.mock import MagicMock
 
