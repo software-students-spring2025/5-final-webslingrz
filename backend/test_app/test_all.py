@@ -51,15 +51,30 @@ def test_register_flow(client, monkeypatch):
     assert response.status_code == 200
     assert b"Bird Game" in response.data
 
-# def test_login_flow(client, monkeypatch):
-#     fake_users = {}
+def test_login_flow(client, monkeypatch):
+    fake_users = {}
 
-#     class DummyUsers:
-#         def find_one(self, query): return fake_users.get(query.get("username"))
-#         def insert_one(self, doc): fake_users[doc["username"]] = doc
+    class DummyUsers:
+        def find_one(self, query): return fake_users.get(query.get("username"))
+        def insert_one(self, doc): fake_users[doc["username"]] = doc
 
-#     dummy_mongo = type("Mongo", (), {"db": type("DB", (), {"users": DummyUsers()})})()
-#     monkeypatch.setattr(app_module, "get_mongo", lambda: dummy_mongo)
+    dummy_mongo = type("Mongo", (), {"db": type("DB", (), {"users": DummyUsers()})})()
+    monkeypatch.setattr(app_module, "get_mongo", lambda: dummy_mongo)
+    
+    response = client.post('/register', data={
+        'username': 'newuser',
+        'password': 'password123'
+    })
+
+    assert response.status_code == 302
+
+    response = client.post('/login', data={
+        'username': 'newuser',
+        'password': 'password123'
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b"Bird Game" in response.data
 
 # def test_register_and_login_flow(client, monkeypatch):
 #     fake_users = {}
