@@ -32,6 +32,13 @@ Buy the Froggy Fountain to become worthy of the bird who stands above all other 
 # Task Board
 View our task board [here](https://github.com/orgs/software-students-spring2025/projects/234/views/2)
 
+# Example .env
+Please add an .env into the backend directory before running, an example is shown below:
+```
+SECRET_KEY=devsecret
+MONGO_URI=mongodb://localhost:27017/birdgame
+```
+
 # How to Run via Docker
 ### Full Application
 ```
