@@ -10,8 +10,8 @@
 # About
 
 # Subsystems
-Mongodb:
-Flask/Pygame: [Docker Hub](https://hub.docker.com/repository/docker/bt2181/webslingerz/general)
+* Mongodb: [Docker Hub](https://hub.docker.com/_/mongo)
+* Flask/Pygame: [Docker Hub](https://hub.docker.com/repository/docker/bt2181/webslingerz/general)
 
 # How to Run via Docker
 ### Full Application
