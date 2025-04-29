@@ -2,10 +2,10 @@ import pytest
 from flask import session
 from werkzeug.security import generate_password_hash
 from backend.app import app
-from backend.game import bp as game_bp
 import backend.app as app_module
 import backend.game as game_module
-import backend.auth as auth_module
+# import backend.auth as auth_module
+from unittest.mock import MagicMock
 
 # # ---------------------- Fixtures ----------------------
 
@@ -31,6 +31,51 @@ def test_home_redirect(client):
 
 # # ---------------------- Auth.py Tests ----------------------
 
+def test_register_flow(client, monkeypatch):
+    fake_users = {}
+
+    class DummyUsers:
+        def find_one(self, query): 
+            return fake_users.get(query.get("username"))
+        def insert_one(self, doc): 
+            fake_users[doc["username"]] = doc
+
+    dummy_mongo = type("Mongo", (), {"db": type("DB", (), {"users": DummyUsers()})})()
+
+    monkeypatch.setattr(app_module, "get_mongo", lambda: dummy_mongo)
+    response = client.post('/register', data={
+        'username': 'newuser',
+        'password': 'password123'
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b"Bird Game" in response.data
+
+def test_login_flow(client, monkeypatch):
+    fake_users = {}
+
+    class DummyUsers:
+        def find_one(self, query): return fake_users.get(query.get("username"))
+        def insert_one(self, doc): fake_users[doc["username"]] = doc
+
+    dummy_mongo = type("Mongo", (), {"db": type("DB", (), {"users": DummyUsers()})})()
+    monkeypatch.setattr(app_module, "get_mongo", lambda: dummy_mongo)
+    
+    response = client.post('/register', data={
+        'username': 'newuser',
+        'password': 'password123'
+    })
+
+    assert response.status_code == 302
+
+    response = client.post('/login', data={
+        'username': 'newuser',
+        'password': 'password123'
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b"Bird Game" in response.data
+
 # def test_register_and_login_flow(client, monkeypatch):
 #     fake_users = {}
 
@@ -39,12 +84,12 @@ def test_home_redirect(client):
 #         def insert_one(self, doc): fake_users[doc["username"]] = doc
 
 #     dummy_mongo = type("Mongo", (), {"db": type("DB", (), {"users": DummyUsers()})})()
-#     monkeypatch.setattr(auth_module.register.__globals__, "get_mongo", lambda: dummy_mongo)
-#     monkeypatch.setattr(auth_module.login.__globals__, "get_mongo", lambda: dummy_mongo)
+#     monkeypatch.setattr(app_module, "get_mongo", lambda: dummy_mongo)
+#     # monkeypatch.setattr(app_module.login.__globals__, "get_mongo", lambda: dummy_mongo)
 
 #     # Register new
 #     res = client.post("/register", data={"username": "testuser", "password": "secret"}, follow_redirects=True)
-#     assert b"Login" in res.data
+#     assert b"Bird Game" in res.data
 
 #     # Register again
 #     res = client.post("/register", data={"username": "testuser", "password": "secret"}, follow_redirects=True)

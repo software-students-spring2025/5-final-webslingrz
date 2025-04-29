@@ -1,5 +1,6 @@
 import pytest
 from flask import Flask, session, redirect, request
+from unittest.mock import patch, MagicMock
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -98,3 +99,37 @@ def test_logout(client):
 
     response = client.get('/logout')
     assert b"Login Page" in response.data
+
+@patch('app.get_mongo')
+def test_register(mock_mongo, client):
+    mock_db = MagicMock()
+    mock_mongo.return_value = mock_db
+    mock_db.db.users.find_one.return_value = None
+
+    response = client.post('/register', data={
+        'username': 'newuser',
+        'password': 'password123'
+    }, follow_redirects=True)
+
+    # mock_db.db.users.insert_one.assert_called_once()
+    assert b"Registered successfully" in response.data
+
+@patch('app.get_mongo')
+def test_register_get(mock_mongo, client):
+    mock_mongo.return_value = MagicMock()
+    response = client.get('/register')
+    assert response.status_code == 200
+
+@patch('app.get_mongo')
+def test_register_existing_user(mock_mongo, client):
+    mock_db = MagicMock()
+    mock_mongo.return_value = mock_db
+    mock_db.db.users.find_one.return_value = {'username': 'existinguser'}
+
+    response = client.post('/register', data={
+        'username': 'existinguser',
+        'password': 'password123'
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    # assert '/register' in response.headers['Location']
