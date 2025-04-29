@@ -94,10 +94,10 @@ def play():
         return redirect(url_for('auth.login'))
     # Serve the index.html file from the build directory
 
-    print(f"WEB_DIR path: {WEB_DIR}")
-    print(f"Full path: {os.path.join(WEB_DIR, 'index.html')}")
-    print(f"File exists: {os.path.exists(os.path.join(WEB_DIR, 'index.html'))}")
-    print(f"Directory contents: {os.listdir(WEB_DIR) if os.path.exists(WEB_DIR) else 'Directory not found'}")
+    # print(f"WEB_DIR path: {WEB_DIR}")
+    # print(f"Full path: {os.path.join(WEB_DIR, 'index.html')}")
+    # print(f"File exists: {os.path.exists(os.path.join(WEB_DIR, 'index.html'))}")
+    # print(f"Directory contents: {os.listdir(WEB_DIR) if os.path.exists(WEB_DIR) else 'Directory not found'}")
 
     return send_from_directory(WEB_DIR, 'index.html')
 
@@ -146,67 +146,12 @@ def build_game():
             "message": f"Error: {str(e)}"
         }), 500
 
-@game.route('/update-money', methods=['POST'])
-def update_money():
-    if 'user_id' not in session:
-        return jsonify({"success": False, "message": "Not logged in"}), 401
-    
-    data = request.get_json()
-    if not data or 'money' not in data:
-        return jsonify({"success": False, "message": "Invalid data"}), 400
-    
-    try:
-        # from app import get_mongo
-        # mongo = get_mongo()
-        
-        # Update the user's money
-        mongo.db.users.update_one(
-            {"_id": ObjectId(session['user_id'])},
-            {"$set": {"money": data['money']}}
-        )
-        
-        return jsonify({"success": True})
-    
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
-
-@game.route('/update-birds', methods=['POST'])
-def update_birds():
-    if 'user_id' not in session:
-        return jsonify({"success": False, "message": "Not logged in"}), 401
-    
-    data = request.get_json()
-    if not data or 'birds' not in data:
-        return jsonify({"success": False, "message": "Invalid data"}), 400
-    
-    try:
-        # from app import get_mongo
-        # mongo = get_mongo()
-        
-        # Update the user's birds collection
-        mongo.db.users.update_one(
-            {"_id": ObjectId(session['user_id'])},
-            {"$set": {"birds": data['birds']}}
-        )
-        
-        return jsonify({"success": True})
-    
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
-
-
 @app.route('/')
 def home():
     return redirect('/dashboard')
 
-# def register_blueprints():
-#     import backend.game as game
-#     app.register_blueprint(game.bp)
-
 app.register_blueprint(auth)
 app.register_blueprint(game)
-# register_blueprints()
-
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, port=5001)
