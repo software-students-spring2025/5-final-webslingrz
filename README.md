@@ -7,6 +7,12 @@
 * Jasmine Fan [Jasmine's Github](https://github.com/jasmine7310)
 * Bryant To [Bryant's Github](https://github.com/bryantto08)
 
+# About
+
+# Subsystems
+* Mongodb: [Docker Hub](https://hub.docker.com/_/mongo)
+* Flask/Pygame: [Docker Hub](https://hub.docker.com/repository/docker/bt2181/webslingerz/general)
+
 # How to Run via Docker
 ### Full Application
 ```
@@ -34,7 +40,7 @@ cd ..
 
 Visit localhost via: http://127.0.0.1:5001
 
-# Running bird game (temporarily, until pygame is linked with flask)
+# Running bird game standalone
 ```
 python3 -m venv venv
 source venv/bin/activate 
