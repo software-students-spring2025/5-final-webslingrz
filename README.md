@@ -20,6 +20,10 @@ Birds will spawn on your screen. Click them to add them to your collection!
 Keep track of the birds you collected with the Birdiary!  
   
 Just like in real life, your collected birds will generate gold.  
+
+Different birds have different degrees of rarity. Try and collect them all!
+
+The rarer the bird, the better the gold they generate.
   
 Use this gold to buy decoration to drip out your desktop and attract rarer birds!  
   
@@ -83,6 +87,7 @@ source venv/bin/activate
 
 ### Unit tests for web app
 A note about unit testing: bird_game.py is excluded via .coveragerc as bird_game contains advanced logic such as audio and visuals that are not meant to be unit tested
+
 #### coverage testing (run from backend directory)
 ```
 coverage run -m pytest
@@ -153,4 +158,11 @@ open htmlcov/index.html
 * MongoDB
 * Digital Ocean
 
+# Future Expansion
+* Add in more background options as a purchasable item, similar to furniture
+* Carry over gamestate information to the other tabs in the website, allowing you to
+view your bird collection, gold, furniture purchased, and other statistics
+* Create more dynamic birds with animated assets 
+* Establish bird behavior, allowing them to move to different locations instead of spawning in fixed locations
+* Instead of using the mouse to collect birds, implement hand tracking ML to collect birds and put them in a bag
 
